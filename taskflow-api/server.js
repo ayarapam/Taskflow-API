@@ -174,7 +174,6 @@ app.get('/tarefas', (req, res) => {
 // req.query é um parametro de pergunta, 
 // req.query = uma desconstrução,
 // ela checa uma informação dentro do Json e apartir dela filtra
-
 //--------------------------------------------
 // 4 . Rota 404 — capturar rotas não encontradas
 //--------------------------------------------

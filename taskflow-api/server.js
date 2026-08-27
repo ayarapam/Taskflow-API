@@ -102,7 +102,7 @@ app.get('/texto', (req, res) => {
 // 3 . desasfio para criar rota /tarefas
 //----------------------------------------
 // Dados em memória — substitui o banco por enquanto
-const tarefas = [
+let tarefas = [
     { id: 1, texto: 'Estudar Node', prioridade: 'alta', coluna: 'afazer' },
     { id: 2, texto: 'Criar API', prioridade: 'alta', coluna: 'andamento' },
     { id: 3, texto: 'Testar Postman', prioridade: 'media', coluna: 'concluido' },
@@ -157,7 +157,7 @@ app.get('/tarefas', (req, res) => {
     //const prioridade = req.query['prioridade']
 
     // Começar com todas as tarefas
-    let resultado = tarefas; //caso fosse contastante não oderia funcianar por não ser flexivel, quando se é atribuidp mais de um vez
+    let resultado = tarefas; //caso fosse contastante não poderia funcianar por não ser flexivel, quando se é atribuidp mais de um vez
 
     // Filtrar por coluna se informado
     if (coluna) {
@@ -174,6 +174,209 @@ app.get('/tarefas', (req, res) => {
 // req.query é um parametro de pergunta, 
 // req.query = uma desconstrução,
 // ela checa uma informação dentro do Json e apartir dela filtra
+
+//--------------------------------------------
+// 5 . POST — criar nova tarefa
+//--------------------------------------------
+
+// Variável para controlar o próximo ID
+let proximoId = 4; // começa em 4 pois já temos 3 tarefas
+
+//No GET a informação vem na URL (params e query). No POST, PUT e DELETE os dados vêm no body da requisição em formato JSON. Por
+//padrão o Express não sabe ler o body — precisamos do middleware express.json().
+app.use(express.json());
+//// express.json() DEVE VIR ANTES das rotas
+// É um middleware — processa a requisição antes de chegar na rota
+// Agora todas as rotas POST, PUT e DELETE
+// podem acessar req.body normalmente
+
+
+app.post('/tarefas', (req, res) => {
+    // req.body contém os dados enviados no body da requisição
+    const { texto, prioridade, coluna, cidade } = req.body;
+
+    // Criar a nova tarefa com ID gerado pelo servidor
+    const novaTarefa = {
+        id: proximoId++,  // usa o ID atual e incrementa
+        texto: texto,
+        prioridade: prioridade || 'media',  // valor padrão se não enviado
+        coluna: coluna || 'afazer',
+        cidade: cidade || '',
+    };
+
+    // Adicionar ao array em memória
+    tarefas.push(novaTarefa);
+
+    // Retornar a tarefa criada com status 201 Created
+    res.status(201).json(novaTarefa);
+});
+
+// Por que 201 e não 200?
+// 200 = sucesso genérico | 201 = recurso criado com sucesso
+
+//--------------------------------------------
+// 6 . PUT — substituir tarefa
+//--------------------------------------------
+// PUT substitui TODOS os campos da tarefa pelo que foi enviado
+// Diferente do PATCH que atualiza apenas campos específicos
+app.put('/tarefas/:id', (req, res) => {
+
+    const id = Number(req.params.id);
+    const { texto, prioridade, coluna, cidade } = req.body;
+
+    // Encontrar o índice da tarefa no array
+    const indice = tarefas.findIndex(t => t.id === id);
+    //findindes devolve qual posisão ele achou o indice
+
+    // Se não encontrou — retornar 404
+    if (indice === -1) {
+        return res.status(404).json({ erro: 'Tarefa não encontrada' });
+    }
+    //-1 para dizer que o id nao foi encontrado no array,pois não se tem id -1
+
+    // Substituir a tarefa no array mantendo o mesmo ID
+    const tarefaAtualizada = { id, texto, prioridade, coluna, cidade };
+    tarefas[indice] = tarefaAtualizada;
+
+    // Retornar a tarefa atualizada com status 200
+    res.json(tarefaAtualizada);
+});
+
+// Testar no Postman:
+// PUT http://localhost:3000/tarefas/1
+// Body: { "texto": "Estudar Express", "prioridade": "alta", ... }
+
+//--------------------------------------------
+// 7 . DELETE - remover tarefa
+//--------------------------------------------
+
+app.delete('/tarefas/:id', (req, res) => {
+    const id = Number(req.params.id);
+
+    // Verificar se a tarefa existe antes de remover
+    const tarefa = tarefas.find(t => t.id === id);
+
+    if (!tarefa) {
+        return res.status(404).json({ erro: 'Tarefa não encontrada' });
+    }
+
+    // Remover do array com filter
+    tarefas = tarefas.filter(t => t.id !== id);
+    //filter ele cria uma copia do array pegando apenas o id e para atualizar o id tarefas
+
+    // Retornar confirmação da remoção
+    res.json({ mensagem: 'Tarefa removida com sucesso', id });
+});
+
+// Nota: para usar tarefas = tarefas.filter(...)
+// a variável precisa ser declarada com let, não const:
+// let tarefas = [ ... ];
+
+// Testar no Postman:
+// DELETE http://localhost:3000/tarefas/1
+// Não precisa de body — só a URL com o ID
+// Verificar: GET /tarefas → tarefa 1 não aparece mais
+
+//--------------------------------------------
+//  serviço de uduarios 
+//--------------------------------------------
+// Array inicial de usuários:
+let usuarios = [
+    {
+        id: 1,
+        nome: 'admin',
+        email: 'admin@taskflow.com',
+        senha: '1234'
+    },
+    {
+        id: 2,
+        nome: 'ayara',
+        email: 'yaya@taskflow.com',
+        senha: '1234'
+    },
+];
+
+let proximoIdUsuario = 2;
+
+// ROTA 1 — Listar usuários
+// GET /usuarios → 200 [ array de usuários ]
+app.get('/usuarios', (req, res) => {
+    res.json(usuarios);
+});
+
+// ROTA 2 — Buscar usuário por ID
+// GET /usuarios/1 → 200 { id: 1, nome: 'admin', ... }
+// GET /usuarios/99 → 404 { erro: 'Usuário não encontrado' }
+app.get('/usuarios/:id', (req, res) => {
+    const usuario = usuarios.find(u => u.id === Number(req.params.id));
+    if (!usuario) return res.status(404).json({ erro: 'Não encontrada' });
+    res.json(usuario);
+});
+
+// ROTA 3 — Criar usuário
+// POST /usuarios
+// Body: { nome, email, senha }
+// Resposta: 201 + usuário criado com id gerado
+app.post('/usuarios', (req, res) => {
+
+    const novousuario = { id: proximoId++, ...req.body };
+    
+    usuarios.push(novousuario);
+
+    res.status(201).json(novousuario);
+});
+
+// ROTA 4 — Atualizar usuário
+// PUT /usuarios/1
+// Body: { nome, email, senha }
+// Resposta: 200 + usuário atualizado
+app.put('/usuarios/:id', (req, res) => {
+
+    const id = Number(req.params.id);
+    const idx = usuarios.findIndex(u => u.id === id);
+
+    if (idx === -1) return res.status(404).json({ erro: 'Usuario não encontrado' });
+    usuarios[idx] = { id, ...req.body };
+    res.json(usuarios[idx]);
+
+});
+
+// ROTA 5 — Deletar usuário
+// DELETE /usuarios/1
+// Resposta: 200 + { mensagem: 'Usuário removido', id: 1 }
+app.delete('/usuarios/:id', (req, res) => {
+    const id = Number(req.params.id);
+    if (!usuarios.find(u => u.id === id)) return res.status(404).json({ erro: 'Usuario não encontrado' });
+    usuarios = usuarios.filter(u => u.id !== id);
+    res.json({ mensagem: 'Usuario removida', id });
+});
+
+// DESAFIO: não permitir dois usuários com o mesmo email
+// No POST: verificar se já existe email → 400 { erro: 'Email já cadastrado' }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //--------------------------------------------
 // 4 . Rota 404 — capturar rotas não encontradas
 //--------------------------------------------
@@ -191,3 +394,5 @@ app.use((req, res) => {
 });
 // Testar no Postman:
 // GET http://localhost:3000/qualquer-coisa → 404
+
+

@@ -85,6 +85,61 @@ app.get('/usuarios', (req, res) => {
     res.json(usuarios);
 });
 
+app.get('/estatisticas', (req , res) => {
+    const {coluna} = req.query
+
+    let tarefasfilt = tarefas;
+
+    if (coluna){
+        tarefasfilt = tarefas.filter(t => t.coluna === coluna);
+    }
+
+    const totalTarefa = tarefas.length
+
+    const porColuna = {
+        afazer: tarefasfilt.filter(t => t.coluna === 'afazer').length,
+        andamento: tarefasfilt.filter(t => t.coluna === 'andamento').length,
+        concluido: tarefasfilt.filter(t => t.coluna === 'concluido').length
+    };
+
+    const porPrioridade = {
+        baixa: tarefasfilt.filter(t => t.prioridade === 'baixa').length,
+        media: tarefasfilt.filter(t => t.prioridade === 'media').length,
+        alta: tarefasfilt.filter(t => t.prioridade === 'alta').length
+    }
+
+    const comMaisTarefas = Object.entries(porColuna).sort((a, b) => b[1])[0][0];
+
+    res.json({
+        totalTarefa,
+        porColuna,
+        porPrioridade,
+        'Mais tarefas': comMaisTarefas
+    });
+
+})
+
+app.get('/estatisticas/resumo', (req, res) => {
+     const total = tarefas.length;
+
+     const afazer = tarefas.filter(t => t.coluna === 'afazer').length
+     const andamento = tarefas.filter(t => t.coluna === 'andamento').length
+     const concluido = tarefas.filter(t => t.coluna === 'concluido').length
+
+     const prioridades = {
+        baixa: tarefas.filter(t => t.prioridade === 'baixa').length,
+        media: tarefas.filter(t => t.prioridade === 'media').length,
+        alta: tarefas.filter(t => t.prioridade === 'alta').length
+     };
+
+     const prioridadeComun = Object.entries(prioridades).sort((a, b) => b[1])[0][0];
+
+     const resumo = `Você tem ${total} tarefa(s): ${concluido} conluída(s), ${andamento} em adamento e ${afazer} a fazer. Prioridade mais comum: ${prioridadeComun}`
+
+     res.json({resumo});
+
+});
+
 //----------------------------------------
 // Rotas/:id
 //----------------------------------------
@@ -128,8 +183,24 @@ app.post('/tarefas', (req, res) => {
 });
 
 app.post('/usuarios', (req, res) => {
+    const {nome , email, senha} = req.body;
 
-    const novousuario = { id: proximoIdUsuario++, ...req.body };
+    if (!nome, !email, !senha){
+        return res.status(400).json({ erro:'Todos os campos sâo obrigatorios'})
+    }
+
+    const emailEx = usuarios.find(u => u.email === email);
+
+    if (emailEx) {
+        return res.status(406).json({erro: 'Email já cadastrado'});
+    }
+
+    const novousuario = { 
+        id: proximoIdUsuario++, 
+        nome,
+        email,
+        senha
+    };
     
     usuarios.push(novousuario);
 
@@ -161,6 +232,11 @@ app.put('/usuarios/:id', (req, res) => {
 
     const id = Number(req.params.id);
     const idx = usuarios.findIndex(u => u.id === id);
+    const emailEx = usuarios.find(u => u.email === req.body.email && u.id !== id)
+
+    if (emailEx){
+        return res.status(400).json({ erro:'Email já cadastrado'});
+    }
 
     if (idx === -1) return res.status(404).json({ erro: 'Usuario não encontrado' });
     usuarios[idx] = { id, ...req.body };

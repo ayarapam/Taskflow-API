@@ -65,19 +65,6 @@ app.get('/texto', (req, res) => {
     res.send('Resposta em texto simples');
 });
 
-app.get('/tarefas/:id', (req, res) => {
-
-    const id = Number(req.params.id);
-
-    const tarefa = tarefas.find(t => t.id === id);
-
-    if (!tarefa) {
-        return res.status(404).json({ erro: 'Tarefa não encontrada' });
-    }
-
-    res.json(tarefa)
-});
-
 app.get('/tarefas', (req, res) => {
 
     const { coluna, prioridade } = req.query;
@@ -96,6 +83,22 @@ app.get('/tarefas', (req, res) => {
 
 app.get('/usuarios', (req, res) => {
     res.json(usuarios);
+});
+
+//----------------------------------------
+// Rotas/:id
+//----------------------------------------
+app.get('/tarefas/:id', (req, res) => {
+
+    const id = Number(req.params.id);
+
+    const tarefa = tarefas.find(t => t.id === id);
+
+    if (!tarefa) {
+        return res.status(404).json({ erro: 'Tarefa não encontrada' });
+    }
+
+    res.json(tarefa)
 });
 
 app.get('/usuarios/:id', (req, res) => {

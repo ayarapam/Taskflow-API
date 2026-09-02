@@ -22,7 +22,7 @@ const servidor = http.createServer((req, res) => {
     }
 });
 
-// Iniciar o servidor
+// Iniciar o servido
 servidor.listen(3000, () => {
     console.log('Servidor rodando em http://localhost:3000');
 });

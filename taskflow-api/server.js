@@ -13,7 +13,7 @@ const tarefasRoutes = require('./src/routes/tarefas.routes');
 const usuariosRoutes = require('./src/routes/usuarios.routes');
 
 //----------------------------------------
-// servidor com Express
+// servidor com Expres
 //----------------------------------------
 const app = express();
 const PORTA = 3000;

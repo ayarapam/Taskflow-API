@@ -2,7 +2,7 @@
 # NUNCA enviar para o GitHub — pode ter centenas de MB
 node_modules/
 
-saladeaula/
+
 
 # Variáveis de ambiente — podem conter senhas e chaves
 .env

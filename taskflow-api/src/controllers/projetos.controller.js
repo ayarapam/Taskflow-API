@@ -64,7 +64,7 @@ const projetosController = {
         const indice = projetos.findIndex(p => p.id === parseInt(id));
 
         if (indice === -1) {
-            return res.status(404).json({ erro: 'Projeto não encontrado' });
+            return res.status(404).json({ erro: 'projeto não encontrado' });
         }
 
         const projetoAtualizado = { id, nome, descricao, ativo };

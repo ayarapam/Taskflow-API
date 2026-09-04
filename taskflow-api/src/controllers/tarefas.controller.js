@@ -1,5 +1,6 @@
 const tarefaModel = require('../models/tarefa.model');
 
+
 //----------------------------------------
 // Controller
 //----------------------------------------
@@ -38,6 +39,7 @@ const tarefasController = {
     //----------------------------------------
     // Rotas - POST
     //----------------------------------------
+    //vincular usuario a tarefa
     criar(req, res) {
         const {texto} = req.body;
         if (!texto) return res.status(400).json({ erro: 'Texto obrigatório' });

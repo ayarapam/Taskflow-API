@@ -63,7 +63,7 @@ module.exports = {
             alta: tarefas.filter(t => t.prioridade === 'alta').length
         };
         const prioridadeComun = Object.entries(prioridades).sort((a, b) => b[1] - a[1])[0][0];
-        return `Você tem ${total} tarefa(s): ${concluido} conluída(s), ${andamento} em adamento e ${afazer} a fazer. Prioridade mais comum: ${prioridadeComun}`; 
+        return `Você tem ${total} tarefa(s): ${concluido} conluída(s), ${andamento} em adamento e ${afazer} a fazer. Prioridade mais comum: ${prioridadeComun}`;                
     }
 
 };

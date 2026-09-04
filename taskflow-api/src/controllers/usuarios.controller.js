@@ -1,21 +1,4 @@
-//----------------------------------------
-// VARIAVEIS
-//----------------------------------------
-let usuarios = [
-    {
-        id: 1,
-        nome: 'admin',
-        email: 'admin@taskflow.com',
-        senha: '1234'
-    },
-    {
-        id: 2,
-        nome: 'ayara',
-        email: 'yaya@taskflow.com',
-        senha: '1234'
-    },
-];
-let proximoIdUsuario = 3;
+const usuarioModel = require('../models/usuario.model');
 
 //----------------------------------------
 // controller
@@ -26,14 +9,14 @@ const usuariosController = {
     // Rotas - get
     //----------------------------------------
     listar(req, res) {
-        res.json(usuarios);
+        res.json(usuarioModel.listar());
     },
 
     //----------------------------------------
     // Rotas/:id
     //----------------------------------------
     buscarPorId(req, res) {
-        const usuario = usuarios.find(u => u.id === Number(req.params.id));
+        const usuario = usuarioModel.buscarPorId(Number(req.params.id));
 
         if (!usuario) 
             return res.status(404).json({ erro: 'Usuário não encontrada' });
@@ -45,24 +28,14 @@ const usuariosController = {
     // Rotas - post
     //----------------------------------------
     criar(req, res) {
-        const { nome, email } = req.body;
-
-        if (!nome || !email) {
+        const { nome, email, senha } = req.body;
+        if (!nome || !email || !senha) {
             return res.status(400).json({ erro: 'Todos os campos sâo obrigatorios' })
         }
-
-        if (usuarios.find(u => u.email === email))
+        if (usuarioModel.buscarPorEmail(email))
             return res.status(400).json({ erro: 'Email já cadastrado' });
-
-        const novousuario = {
-            id: proximoIdUsuario++,
-            nome,
-            email,
-        };
-
-        usuarios.push(novousuario);
-
-        res.status(201).json(novousuario);
+        const novoUsuario = usuarioModel.adicionar(nome, email, senha);
+        res.status(201).json(novoUsuario);
     },
 
     //----------------------------------------
@@ -70,26 +43,29 @@ const usuariosController = {
     //----------------------------------------
     atualizar(req, res) {
         const id = Number(req.params.id);
-        const idx = usuarios.findIndex(u => u.id === id);
-        const emailEx = usuarios.find(u => u.email === req.body.email && u.id !== id)
 
-        if (emailEx) {
+        if (!usuarioModel.buscarPorId(id)) {
+            return res.status(404).json({ erro: 'Usuario não encontrado' });
+        }
+
+        if (usuarioModel.buscarPorEmail(req.body.email, id)) {
             return res.status(400).json({ erro: 'Email já cadastrado' });
         }
 
-        if (idx === -1) return res.status(404).json({ erro: 'Usuario não encontrado' });
-        usuarios[idx] = { id, ...req.body };
-        res.json(usuarios[idx]);
+        const usuarioAtualizado = usuarioModel.atualizar(id, req.body);
 
+        res.json(usuarioAtualizado);
     },
 
     //----------------------------------------
     // Rotas - delete
     //----------------------------------------
     remover(req, res) {
-        const idx = usuarios.findIndex(u => u.id === parseInt(req.params.id));
-        if (idx === -1) return res.status(404).json({ erro: 'Usuario não encontrado' });
-        const usuarioRemovido = usuarios.splice(idx, 1)[0];
+        const usuario = usuarioModel.buscarPorId(Number(req.params.id));
+        if (!usuario) {
+            return res.status(404).json({ erro: 'Usuario não encontrado' });
+        }
+        const usuarioRemovido = usuarioModel.remover(Number(req.params.id));
         const {senha, ...usuarioSemSenha} = usuarioRemovido;
         res.json({ mensagem: 'Usuario removida', usuario: usuarioSemSenha });
     },

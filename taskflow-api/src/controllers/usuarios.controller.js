@@ -1,4 +1,5 @@
 const usuarioModel = require('../models/usuario.model');
+const tarefaModel = require('../models/tarefa.model');
 
 //----------------------------------------
 // controller
@@ -34,8 +35,7 @@ const usuariosController = {
         }
         if (usuarioModel.buscarPorEmail(email))
             return res.status(400).json({ erro: 'Email já cadastrado' });
-        const novoUsuario = usuarioModel.adicionar(nome, email, senha);
-        res.status(201).json(novoUsuario);
+        res.status(201).json(usuarioModel.adicionar({ nome, email, senha }));
     },
 
     //----------------------------------------
@@ -65,6 +65,11 @@ const usuariosController = {
         if (!usuario) {
             return res.status(404).json({ erro: 'Usuario não encontrado' });
         }
+
+        if (tarefaModel.contarPorUsuario(id) > 0) {
+            return res.status(400).json({ erro: 'Não é possível remover usuário com tarefas associadas' });
+        }
+        
         const usuarioRemovido = usuarioModel.remover(Number(req.params.id));
         const {senha, ...usuarioSemSenha} = usuarioRemovido;
         res.json({ mensagem: 'Usuario removida', usuario: usuarioSemSenha });

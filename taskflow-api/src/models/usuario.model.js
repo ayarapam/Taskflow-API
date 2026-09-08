@@ -35,7 +35,7 @@ module.exports = {
     atualizar: (id, dados) => {
         const idx = usuarios.findIndex(u => u.id === id);
         if (idx === -1) return null;
-        usuarios[idx] = { id, ...dados };
+         usuarios[idx] = { ...usuarios[idx], ...dados, id };
         return usuarios[idx];
     },
     remover: (id) => {

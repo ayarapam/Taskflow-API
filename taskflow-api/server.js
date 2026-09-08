@@ -7,21 +7,31 @@ console.log('TaskFlow API — pronto para o Express!')
 const express = require('express');
 
 //----------------------------------------
-// Importar o router
+// rotas - controllers
 //----------------------------------------
 const tarefasRoutes = require('./src/routes/tarefas.routes');
 const usuariosRoutes = require('./src/routes/usuarios.routes');
 const projetosRoutes = require('./src/routes/projetos.routes');
+const logger = require('./src/middlewares/logger'); 
+const validarContentType = require('./src/middlewares/validarContentType');
+const temporizador = require('./src/middlewares/temporizador');
 
 //----------------------------------------
-// servidor com Expres
+// Configuração do Express
 //----------------------------------------
 const app = express();
 const PORTA = 3000;
 app.use(express.json());
 
 //----------------------------------------
-// rotas
+// Middlewares
+//----------------------------------------
+app.use(validarContentType);
+app.use(logger);
+app.use(temporizador);
+
+//----------------------------------------
+// Rotas
 //----------------------------------------
 app.use('/tarefas', tarefasRoutes);
 app.use('/usuarios', usuariosRoutes);

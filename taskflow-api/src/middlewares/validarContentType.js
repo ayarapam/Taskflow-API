@@ -1,5 +1,5 @@
 function validarContentType(req, res, next) {
-    const metodosComBody = ['POST', 'PUT'];
+    const metodosComBody = ['POST', 'PUT', 'PATCH'];
     if (metodosComBody.includes(req.method)) {
         const contentType = req.headers['content-type'];
         if (!contentType || !contentType.includes('application/json')) {

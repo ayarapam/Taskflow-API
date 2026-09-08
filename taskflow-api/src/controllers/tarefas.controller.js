@@ -41,9 +41,18 @@ const tarefasController = {
     //----------------------------------------
     //vincular usuario a tarefa
     criar(req, res) {
-        const {texto} = req.body;
-        if (!texto) return res.status(400).json({ erro: 'Texto obrigatório' });
+        const {texto, usuarioId} = req.body;
+        if (!texto) {return res.status(400).json({ erro: 'Texto obrigatório' });}
+
+        if (usuarioId !== undefined && usuarioId !== null) {
+            const usuario = usario
+        }
+
+
+
+
         res.status(201).json(tarefaModel.adicionar(texto));
+
     },
 
     //----------------------------------------

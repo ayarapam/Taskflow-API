@@ -11,12 +11,14 @@ module.exports = {
     listar: () => tarefas,
     listarPorColuna: (coluna) => tarefas.filter(t => t.coluna === coluna),
     buscarPorId: (id) => tarefas.find(t => t.id === id),
-    adicionar: (texto, prioridade, coluna) => {
+    adicionar: (texto, prioridade, coluna, usuarioId) => {
         const novaTarefa = { 
             id: proximoId++, 
             texto, 
             prioridade: prioridade || 'media', 
-            coluna: coluna || 'afazer'};
+            coluna: coluna || 'afazer',
+            usuarioId: usuarioId || null
+        };
         tarefas.push(novaTarefa);
         return novaTarefa;
     },

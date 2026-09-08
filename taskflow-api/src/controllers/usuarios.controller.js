@@ -20,7 +20,7 @@ const usuariosController = {
         const usuario = usuarioModel.buscarPorId(Number(req.params.id));
 
         if (!usuario) 
-            return res.status(404).json({ erro: 'Usuário não encontrada' });
+            return res.status(404).json({ erro: 'Usuário não encontrado' });
        
         res.json(usuario);
     },

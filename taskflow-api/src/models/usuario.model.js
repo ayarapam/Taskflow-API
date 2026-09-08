@@ -19,10 +19,9 @@ let proximoIdUsuario = 3;
 
 module.exports = {
     listar: () => usuarios,
-    buscarPorId: (id) => usuarios.find(u => u.id === id),
+    buscar: (id) => usuarios.find(u => u.id === id),
     buscarPorEmail: (email) => usuarios.find(u => u.email === email),
-    buscarPorNome: (nome) => usuarios.find(u => u.nome === nome),
-    adicionar: (nome, email, senha) => {
+    adicionar: ({ nome, email, senha }) => {
         const novoUsuario = { 
             id: proximoIdUsuario++, 
             nome, 

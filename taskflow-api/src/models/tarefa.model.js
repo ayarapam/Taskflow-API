@@ -13,16 +13,18 @@ module.exports = {
     listarPorUsuario: (usuarioId) => tarefas.filter(t => t.usuarioId === usuarioId),
     listarPorProjeto: (projetoId) => tarefas.filter(t => t.projetoId === projetoId),
     buscarPorId: (id) => tarefas.find(t => t.id === id),
-    adicionar: (texto, prioridade, coluna, usuarioId) => {
-        const novaTarefa = {
+    adicionar: ({ texto, prioridade, coluna, usuarioId, projetoId }) => {
+        const nova = {
             id: proximoId++,
             texto,
             prioridade: prioridade || 'media',
             coluna: coluna || 'afazer',
-            usuarioId: usuarioId || null
+            usuarioId: usuarioId || null,
+            projetoId: projetoId || null,
+            concluidaEm: null,
         };
-        tarefas.push(novaTarefa);
-        return novaTarefa;
+        tarefas.push(nova);
+        return nova;
     },
     contarEmAndamentoPorUsuario: (usuarioId, excluirId) =>
         tarefas.filter(t =>
@@ -75,6 +77,13 @@ module.exports = {
     atualizar: (id, dados) => {
         const idx = tarefas.findIndex(t => t.id === id);
         if (idx === -1) return null;
+        // Registrar data de conclusão automaticamente
+        if (dados.coluna === 'concluido' && tarefas[idx].coluna !== 'concluido') {
+            dados.concluidaEm = new Date().toISOString();
+        }
+        if (dados.coluna && dados.coluna !== 'concluido') {
+            dados.concluidaEm = null;
+        }
         tarefas[idx] = { ...tarefas[idx], ...dados, id };
         return tarefas[idx];
     },

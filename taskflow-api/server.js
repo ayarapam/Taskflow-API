@@ -1,9 +1,7 @@
 
 console.log('TaskFlow API — pronto para o Express!')
 
-//----------------------------------------
-// servidor com Express
-//----------------------------------------
+require('dotenv').config();
 const express = require('express');
 
 //----------------------------------------
@@ -15,12 +13,36 @@ const projetosRoutes = require('./src/routes/projetos.routes');
 const logger = require('./src/middlewares/logger'); 
 const validarContentType = require('./src/middlewares/validarContentType');
 const temporizador = require('./src/middlewares/temporizador');
+//const corsMiddlewares = require ('./src/middlewares/cors')
+
+//----------------------------------------
+// cors
+//----------------------------------------
+const cors = require('cors');
 
 //----------------------------------------
 // Configuração do Express
 //----------------------------------------
 const app = express();
-const PORTA = 3000;
+
+//----------------------------------------
+// Config PORTA
+//----------------------------------------
+const PORTA = process.env.PORTA || 3000;
+
+//----------------------------------------
+// cors
+//----------------------------------------
+app.use(cors({
+    origin: process.env.CORS_ORIGIN || 'https://www.google.com',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    maxAge: 86400,
+}));
+
+//----------------------------------------
+//
+//----------------------------------------
 app.use(express.json());
 
 //----------------------------------------
@@ -29,6 +51,7 @@ app.use(express.json());
 app.use(validarContentType);
 app.use(logger);
 app.use(temporizador);
+//app.use(corsMiddlewares);
 
 //----------------------------------------
 // Rotas

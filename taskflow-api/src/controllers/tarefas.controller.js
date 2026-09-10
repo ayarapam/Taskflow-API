@@ -46,6 +46,16 @@ const tarefasController = {
     // Rotas - POST
     //----------------------------------------
     criar(req, res) {
+        if (usuarioId) {
+            if (!usuarioModel.buscar(parseInt(usuarioId)))
+                return res.status(400).json({ erro: 'Usuário não encontrado' });
+
+            if (coluna === 'andamento' &&
+                tarefaModel.contarEmAndamentoPorUsuario(parseInt(usuarioId)) >= 2)
+                return res.status(400).json({
+                    erro: 'Limite de 2 tarefas em andamento por usuário atingido',
+                });
+        }
         res.status(201).json(tarefaModel.adicionar(req.body));
     },
 

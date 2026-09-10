@@ -30,9 +30,6 @@ const usuariosController = {
     //----------------------------------------
     criar(req, res) {
         const { nome, email, senha } = req.body;
-        if (!nome || !email || !senha) {
-            return res.status(400).json({ erro: 'Todos os campos sâo obrigatorios' })
-        }
         if (usuarioModel.buscarPorEmail(email))
             return res.status(400).json({ erro: 'Email já cadastrado' });
         res.status(201).json(usuarioModel.adicionar({ nome, email, senha }));

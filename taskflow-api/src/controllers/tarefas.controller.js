@@ -46,6 +46,7 @@ const tarefasController = {
     // Rotas - POST
     //----------------------------------------
     criar(req, res) {
+        const {coluna, usuarioId } = req.body;
         if (usuarioId) {
             if (!usuarioModel.buscar(parseInt(usuarioId)))
                 return res.status(400).json({ erro: 'Usuário não encontrado' });

@@ -1,6 +1,6 @@
 const schemas = {
     tarefa: {
-        texto: { obrigatorio: true, tipo: "string" },
+        texto: { obrigatorio: true, tipo: "string", minLength: 3 },
         prioridade: { obrigatorio: true, tipo: "string", enum: ["alta", "media", "baixa"] },
         coluna: { obrigatorio: true, tipo: "string", enum: ["afazer", "andamento", "concluido"] },
         usuarioId: { obrigatorio: false, tipo: "number" },
@@ -16,4 +16,4 @@ const schemas = {
     },
 };
 
-module.exports = schemas;
+module.exports = schemas; 

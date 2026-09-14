@@ -10,10 +10,12 @@ const express = require('express');
 const tarefasRoutes = require('./src/routes/tarefas.routes');
 const usuariosRoutes = require('./src/routes/usuarios.routes');
 const projetosRoutes = require('./src/routes/projetos.routes');
+const authRoutes = require ('./src/routes/auth.routes.js')
+const autenticar = require('./src/middlewares/autenticar');
 const logger = require('./src/middlewares/logger'); 
 const validarContentType = require('./src/middlewares/validarContentType');
 const temporizador = require('./src/middlewares/temporizador');
-//const corsMiddlewares = require ('./src/middlewares/cors')
+
 
 //----------------------------------------
 // cors
@@ -51,14 +53,14 @@ app.use(express.json());
 app.use(validarContentType);
 app.use(logger);
 app.use(temporizador);
-//app.use(corsMiddlewares);
 
 //----------------------------------------
 // Rotas
 //----------------------------------------
-app.use('/tarefas', tarefasRoutes);
-app.use('/usuarios', usuariosRoutes);
-app.use('/projetos', projetosRoutes);
+app.use('/auth', authRoutes);
+app.use('/tarefas', autenticar, tarefasRoutes);
+app.use('/usuarios', autenticar, usuariosRoutes);
+app.use('/projetos', autenticar, projetosRoutes);
 
 //----------------------------------------
 // Rota 404

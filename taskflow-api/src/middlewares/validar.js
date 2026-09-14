@@ -17,27 +17,28 @@ function validar(schema) {
                 );
             } 
 
-        if (regras.enum && !regras.enum.includes(valor)) {
-            erros.push(
-                `O campo '${campo}' deve ser um de: ${regras.enum.join(', ')}`
-            );
-        }
+            if (regras.enum && !regras.enum.includes(valor)) {
+                erros.push(
+                    `O campo '${campo}' deve ser um de: ${regras.enum.join(', ')}`
+                );
+            }
 
-        if (regras.formato === 'email') {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!re.test(valor))
-                erros.push(`O campo '${campo}' deve ser um email válido`);
-        }
+            if (regras.formato === 'email') {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!re.test(valor))
+                    erros.push(`O campo '${campo}' deve ser um email válido`);
+            }
 
-        if (regras.minLength && valor.length < regras.minLength)
-            erros.push(
-                `O campo '${campo}' deve ter ao menos ${regras.minLength} caracteres`
-            );
+            if (regras.minLength && valor.length < regras.minLength)
+ 
+                erros.push(
+                    `O campo '${campo}' deve ter ao menos ${regras.minLength} caracteres`
+                );
 
-        if (regras.maxLength && valor.length > regras.maxLength)
-            erros.push(
-                `O campo '${campo}' deve ter no máximo ${regras.maxLength} caracteres`
-            );
+            if (regras.maxLength && valor.length > regras.maxLength)
+                erros.push(
+                    `O campo '${campo}' deve ter no máximo ${regras.maxLength} caracteres`
+                );
         }
 
         if (erros.length > 0)

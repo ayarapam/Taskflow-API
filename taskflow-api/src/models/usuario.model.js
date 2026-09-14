@@ -5,14 +5,14 @@ let usuarios = [
     {
         id: 1,
         nome: 'admin',
-        email: 'admin@taskflow.com',
-        senha: '1234'
+        email: 'admin@gmail.com',
+        senha: '123456'
     },
     {
         id: 2,
         nome: 'ayara',
-        email: 'yaya@taskflow.com',
-        senha: '1234'
+        email: 'yaya@gmail.com',
+        senha: '123456'
     },
 ];
 let proximoIdUsuario = 3;

@@ -46,6 +46,9 @@ app.use(cors({
 //
 //----------------------------------------
 app.use(express.json());
+app.get('/', (req, res)=>{
+    res.json({api: 'taskflow', versão:'1.0', status:'online'});
+});
 
 //----------------------------------------
 // Middlewares

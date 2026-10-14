@@ -9,68 +9,72 @@ const usuariosController = {
     //----------------------------------------
     // Rotas - get
     //----------------------------------------
-    listar(req, res) {
-        res.json(usuarioModel.listar());
+    async listar(req, res) {
+        const { nome } = req.query;
+        let resultado = nome
+            ? await usuarioModel.listarPorNome(nome)
+            : await usuarioModel.listar();
+        res.json(resultado);
     },
 
     //----------------------------------------
     // Rotas/:id
     //----------------------------------------
-    buscarPorId(req, res) {
-        const usuario = usuarioModel.buscarPorId(Number(req.params.id));
+    async buscarPorId(req, res) {
+    const usuario = await usuarioModel.buscarPorId(Number(req.params.id));
 
-        if (!usuario) 
-            return res.status(404).json({ erro: 'Usuário não encontrado' });
-       
-        res.json(usuario);
-    },
+    if (!usuario)
+        return res.status(404).json({ erro: 'Usuário não encontrado' });
+
+    res.json(usuario);
+},
 
     //----------------------------------------
     // Rotas - post
     //----------------------------------------
-    criar(req, res) {
-        const { nome, email, senha } = req.body;
-        if (usuarioModel.buscarPorEmail(email))
-            return res.status(400).json({ erro: 'Email já cadastrado' });
-        res.status(201).json(usuarioModel.adicionar({ nome, email, senha }));
-    },
+    async criar(req, res) {
+    const { nome, email, senha_hash } = req.body;
+    if (await usuarioModel.buscarPorEmail(email))
+        return res.status(400).json({ erro: 'Email já cadastrado' });
+    res.status(201).json(await usuarioModel.adicionar({ nome, email, senha_hash }));
+},
 
     //----------------------------------------
     // Rotas - put
     //----------------------------------------
-    atualizar(req, res) {
-        const id = Number(req.params.id);
+    async atualizar(req, res) {
+    const id = Number(req.params.id);
 
-        if (!usuarioModel.buscarPorId(id)) {
-            return res.status(404).json({ erro: 'Usuario não encontrado' });
-        }
+    if (!await usuarioModel.buscarPorId(id)) {
+        return res.status(404).json({ erro: 'Usuario não encontrado' });
+    }
 
-        if (usuarioModel.buscarPorEmail(req.body.email, id)) {
-            return res.status(400).json({ erro: 'Email já cadastrado' });
-        }
+    if (await usuarioModel.buscarPorEmail(req.body.email, id)) {
+        return res.status(400).json({ erro: 'Email já cadastrado' });
+    }
 
-        const usuarioAtualizado = usuarioModel.atualizar(id, req.body);
+    const usuarioAtualizado = await usuarioModel.atualizar(id, req.body);
 
-        res.json(usuarioAtualizado);
-    },
+    res.json(usuarioAtualizado);
+},
 
     //----------------------------------------
     // Rotas - delete
     //----------------------------------------
-    remover(req, res) {
-        const usuario = usuarioModel.buscarPorId(Number(req.params.id));
-        if (!usuario) {
-            return res.status(404).json({ erro: 'Usuario não encontrado' });
-        }
+    async remover(req, res) {
+    const usuario = await usuarioModel.buscarPorId(Number(req.params.id));
+    if (!usuario) {
+        return res.status(404).json({ erro: 'Usuario não encontrado' });
+    }
 
-        if (tarefaModel.contarPorUsuario(id) > 0) {
-            return res.status(400).json({ erro: 'Não é possível remover usuário com tarefas associadas' });
-        }
-        
-        const usuarioRemovido = usuarioModel.remover(Number(req.params.id));
-        const {senha, ...usuarioSemSenha} = usuarioRemovido;
-        res.json({ mensagem: 'Usuario removida', usuario: usuarioSemSenha });
-    },
+    if (await tarefaModel.contarPorUsuario(id) > 0) {
+        return res.status(400).json({ erro: 'Não é possível remover usuário com tarefas associadas' });
+    }
+
+    const usuarioRemovido = await usuarioModel.remover(Number(req.params.id));
+    const { senha, ...usuarioSemSenha } = usuarioRemovido;
+    res.json({ mensagem: 'Usuario removida', usuario: usuarioSemSenha });
+},
 }
 
 module.exports = usuariosController;

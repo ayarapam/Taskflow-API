@@ -15,29 +15,29 @@ const tarefasController = {
     //----------------------------------------
     // Rotas - get
     //----------------------------------------
-    listar(req, res) {
+    async listar(req, res) {
         const { coluna, usuarioId } = req.query;
-        let resultado = tarefaModel.listar();
+        let resultado = await tarefaModel.listar();
         if (coluna) resultado = resultado.filter(t => t.coluna === coluna);
         if (usuarioId) resultado = resultado.filter(t => t.usuarioId === parseInt(usuarioId));
         res.json(resultado);
     },
 
-    estatisticas(req, res) {
-        const estatisticas = tarefaModel.estatisticas();
+    async estatisticas(req, res) {
+        const estatisticas = await tarefaModel.estatisticas();
         res.json(estatisticas);
     },
 
-    resumo(req, res) {
-        const resumo = tarefaModel.resumo();
+    async resumo(req, res) {
+        const resumo = await tarefaModel.resumo();
         res.json(resumo);
     },
 
     //----------------------------------------
     // Rotas - get/:id
     //----------------------------------------
-    buscarPorId(req, res) {
-        const tarefa = tarefaModel.buscarPorId(parseInt(req.params.id));
+    async buscarPorId(req, res) {
+        const tarefa = await tarefaModel.buscarPorId(parseInt(req.params.id));
         if (!tarefa) return res.status(404).json({ erro: 'Tarefa não encontrada' });
         res.json(tarefa);
     },
@@ -45,32 +45,21 @@ const tarefasController = {
     //----------------------------------------
     // Rotas - POST
     //----------------------------------------
-    criar(req, res) {
-        // const { coluna, usuarioId } = req.body;
-        // if (usuarioId) {
-        //     if (!usuarioModel.buscar(parseInt(usuarioId)))
-        //         return res.status(400).json({ erro: 'Usuário não encontrado' });
-
-        //     if (coluna === 'andamento' &&
-        //         tarefaModel.contarEmAndamentoPorUsuario(parseInt(usuarioId)) >= 2)
-        //         return res.status(400).json({
-        //             erro: 'Limite de 2 tarefas em andamento por usuário atingido',
-        //         });
-        // }
+    async criar(req, res) {
         const dados = {
             ...req.body,
-            usuarioId: req.usuario.id, 
+            usuario_id: req.usuario.id, 
         };
 
-        res.status(201).json(tarefaModel.adicionar(dados));
+        res.status(201).json(await tarefaModel.adicionar(dados));
     },
 
     //----------------------------------------
     // Rotas - PUT
     //----------------------------------------
-    atualizar(req, res) {
+    async atualizar(req, res) {
         const id = parseInt(req.params.id);
-        const atualizada = tarefaModel.atualizar(id, req.body);
+        const atualizada = await tarefaModel.atualizar(id, req.body);
         if (!atualizada) return res.status(404).json({ erro: 'Tarefa não encontrada' });
         res.json(atualizada);
     },
@@ -78,8 +67,8 @@ const tarefasController = {
     //----------------------------------------
     // Rotas - DELETE
     //----------------------------------------
-    remover(req, res) {
-        const removida = tarefaModel.remover(parseInt(req.params.id));
+    async remover(req, res) {
+        const removida = await tarefaModel.remover(parseInt(req.params.id));
 
         if (!removida) {
             return res.status(404).json({ erro: 'Tarefa não encontrada' });

@@ -1,41 +1,47 @@
-
-let tarefas = [
-    { id: 1, texto: 'Estudar Node', prioridade: 'alta', coluna: 'afazer' },
-    { id: 2, texto: 'Criar API', prioridade: 'alta', coluna: 'andamento' },
-    { id: 3, texto: 'Testar Postman', prioridade: 'media', coluna: 'concluido' },
-];
+const pool = require('../database/db');
+// let tarefas = [
+//     { id: 1, texto: 'Estudar Node', prioridade: 'alta', coluna: 'afazer' },
+//     { id: 2, texto: 'Criar API', prioridade: 'alta', coluna: 'andamento' },
+//     { id: 3, texto: 'Testar Postman', prioridade: 'media', coluna: 'concluido' },
+// ];
 
 let proximoId = 4;
 
 module.exports = {
-    listar: () => tarefas,
-    listarPorColuna: (coluna) => tarefas.filter(t => t.coluna === coluna),
-    listarPorUsuario: (usuarioId) => tarefas.filter(t => t.usuarioId === usuarioId),
-    listarPorProjeto: (projetoId) => tarefas.filter(t => t.projetoId === projetoId),
-    buscarPorId: (id) => tarefas.find(t => t.id === id),
-    adicionar: ({ texto, prioridade, coluna, usuarioId, projetoId }) => {
-        const nova = {
-            id: proximoId++,
-            texto,
-            prioridade: prioridade || 'media',
-            coluna: coluna || 'afazer',
-            usuarioId: usuarioId || null,
-            projetoId: projetoId || null,
-            concluidaEm: null,
-        };
-        tarefas.push(nova);
-        return nova;
+
+    listar: async () => {
+        const result = await pool.query(
+            'SELECT * FROM tarefas ORDER BY id'
+        );
+        return result.rows;
     },
-    contarEmAndamentoPorUsuario: (usuarioId, excluirId) =>
+    listarPorColuna: (coluna) => tarefas.filter(t => t.coluna === coluna),
+    listarPorUsuario: (usuario_id) => tarefas.filter(t => t.usuario_id === usuario_id),
+    listarPorProjeto: (projeto_id) => tarefas.filter(t => t.projeto_id === projeto_id),
+    buscarPorId: async (id) => {
+        const result = await pool.query(
+            'SELECT * FROM tarefas WHERE id = $1',
+            [id]
+        );
+        return result.rows[0] || null;
+    },
+    adicionar: async ({ texto, prioridade, coluna, usuario_id, projeto_id }) => {
+        const result = await pool.query(
+            'INSERT INTO tarefas (texto,prioridade,coluna,usuario_id,projeto_id) VALUES ($1,$2,$3,$4,$5)RETURNING *',
+            [texto, prioridade || 'media', coluna || 'afazer', usuario_id, projeto_id]
+        );
+        return result.rows[0];
+    },
+    contarEmAndamentoPorUsuario: (usuario_id, excluir_id) =>
         tarefas.filter(t =>
-            t.usuarioId === usuarioId &&
+            t.usuario_id === usuario_id &&
             t.coluna === 'andamento' &&
-            t.id !== excluirId
+            t.id !== excluir_id
         ).length,
-    contarPorProjeto: (projetoId) =>
-        tarefas.filter(t => t.projetoId === projetoId).length,
-    contarPorUsuario: (usuarioId) =>
-        tarefas.filter(t => t.usuarioId === usuarioId).length,
+    contarPorProjeto: (projeto_id) =>
+        tarefas.filter(t => t.projeto_id === projeto_id).length,
+    contarPorUsuario: (usuario_id) =>
+        tarefas.filter(t => t.usuario_id === usuario_id).length,
     totalPorColuna: (lista) => ({
         afazer: lista.filter(t => t.coluna === 'afazer').length,
         andamento: lista.filter(t => t.coluna === 'andamento').length,
@@ -74,23 +80,17 @@ module.exports = {
         const prioridadeComun = Object.entries(prioridades).sort((a, b) => b[1] - a[1])[0][0];
         return `Você tem ${total} tarefa(s): ${concluido} conluída(s), ${andamento} em adamento e ${afazer} a fazer. Prioridade mais comum: ${prioridadeComun}`;
     },
-    atualizar: (id, dados) => {
-        const idx = tarefas.findIndex(t => t.id === id);
-        if (idx === -1) return null;
-        // Registrar data de conclusão automaticamente
-        if (dados.coluna === 'concluido' && tarefas[idx].coluna !== 'concluido') {
-            dados.concluidaEm = new Date().toISOString();
-        }
-        if (dados.coluna && dados.coluna !== 'concluido') {
-            dados.concluidaEm = null;
-        }
-        tarefas[idx] = { ...tarefas[idx], ...dados, id };
-        return tarefas[idx];
+    atualizar: async (id, dados) => {
+        const { texto, prioridade, coluna, usuario_id } = dados;
+        const result = await pool.query(
+            'UPDATE tarefas SET texto=$1,prioridade=$2,coluna=$3,usuario_id=$4 WHERE id=$5 RETURNING *',
+            [texto, prioridade, coluna, usuario_id, id]
+        );
+        return result.rows[0] || null;
     },
-    remover: (id) => {
-        const idx = tarefas.findIndex(t => t.id === id);
-        if (idx === -1) return null;
-        return tarefas.splice(idx, 1)[0];
+    remover: async (id) => {
+        const result = await pool.query('DELETE FROM tarefas WHERE id=$1 RETURNING *', [id]);
+        return result.rows[0] || null;
     },
 
 };

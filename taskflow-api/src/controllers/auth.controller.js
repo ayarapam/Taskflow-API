@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const usuarioModel = require('../models/usuario.model');
-const pool = require('../database/db');
+
 
 
 const authController = {

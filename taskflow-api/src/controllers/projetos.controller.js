@@ -9,31 +9,31 @@ const projetosController = {
     //----------------------------------------
     // rotas - get
     //----------------------------------------
-    listar(req, res) {
-        res.json(projetoModel.listar());
+    async listar(req, res) {
+        res.json(await projetoModel.listar());
     },
 
     //----------------------------------------
     // Rotas - get/:id
     //----------------------------------------
-    buscarPorId(req, res) {
-        const projeto = projetoModel.buscarPorId(parseInt(req.params.id));
+    async buscarPorId(req, res) {
+        const projeto = await projetoModel.buscarPorId(parseInt(req.params.id));
         if (!projeto) {
             return res.status(404).json({ erro: 'Projeto não encontrado' });
         }
         res.json(projeto);
     },
 
-    resumo(req, res) {
-        const projeto = projetoModel.buscar(parseInt(req.params.id));
+    async resumo(req, res) {
+        const projeto = await projetoModel.buscarPorId(parseInt(req.params.id));
         if (!projeto) return res.status(404).json({ erro: 'Projeto não encontrado' });
 
-        const tarefas = tarefaModel.listarPorProjeto(projeto.id);
+        const tarefas = await tarefaModel.listarPorProjeto(projeto.id);
 
         res.json({
             projeto,
             totalTarefas: tarefas.length,
-            porColuna: tarefaModel.totalPorColuna(tarefas),
+            porColuna: await tarefaModel.totalPorColuna(tarefas),
         });
     },
 
@@ -41,19 +41,19 @@ const projetosController = {
     // rotas - post
     //----------------------------------------
     //vincular usuario com tarefa
-    criar(req, res) {
+    async criar(req, res) {
         const { nome, descricao, ativo } = req.body;
         if (!nome) {
             return res.status(400).json({ erro: 'Nome é obrigatório' });
         }
-        res.status(201).json(projetoModel.adicionar(nome, descricao, ativo));
+        res.status(201).json(await projetoModel.adicionar(nome, descricao, ativo));
     },
 
     //----------------------------------------
     // rotas - put
     //----------------------------------------
-    atualizar(req, res) {
-        const atualizada = projetoModel.atualizar(parseInt(req.params.id), req.body);
+    async atualizar(req, res) {
+        const atualizada = await projetoModel.atualizar(parseInt(req.params.id), req.body);
         if (!atualizada) {
             return res.status(404).json({ erro: 'Projeto não encontrado' });
         }
@@ -63,7 +63,7 @@ const projetosController = {
     //----------------------------------------
     // rotas - delete
     //----------------------------------------
-    remover(req, res) {
+    async remover(req, res) {
         const id = parseInt(req.params.id);
 
         if (!projetoModel.buscar(id))

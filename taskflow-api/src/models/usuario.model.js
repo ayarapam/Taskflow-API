@@ -1,21 +1,4 @@
-//----------------------------------------
-// VARIAVEIS
-//----------------------------------------
-// let usuarios = [
-//     {
-//         id: 1,
-//         nome: 'admin',
-//         email: 'admin@gmail.com',
-//         senha: '123456'
-//     },
-//     {
-//         id: 2,
-//         nome: 'ayara',
-//         email: 'yaya@gmail.com',
-//         senha: '123456'
-//     },
-// ];
-// let proximoIdUsuario = 3;
+
 const pool = require('../database/db');
 
 module.exports = {

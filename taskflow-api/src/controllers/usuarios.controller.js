@@ -21,60 +21,60 @@ const usuariosController = {
     // Rotas/:id
     //----------------------------------------
     async buscarPorId(req, res) {
-    const usuario = await usuarioModel.buscarPorId(Number(req.params.id));
+        const usuario = await usuarioModel.buscarPorId(Number(req.params.id));
 
-    if (!usuario)
-        return res.status(404).json({ erro: 'Usuário não encontrado' });
+        if (!usuario)
+            return res.status(404).json({ erro: 'Usuário não encontrado' });
 
-    res.json(usuario);
-},
+        res.json(usuario);
+    },
 
     //----------------------------------------
     // Rotas - post
     //----------------------------------------
     async criar(req, res) {
-    const { nome, email, senha_hash } = req.body;
-    if (await usuarioModel.buscarPorEmail(email))
-        return res.status(400).json({ erro: 'Email já cadastrado' });
-    res.status(201).json(await usuarioModel.adicionar({ nome, email, senha_hash }));
-},
+        const { nome, email, senha_hash } = req.body;
+        if (await usuarioModel.buscarPorEmail(email))
+            return res.status(400).json({ erro: 'Email já cadastrado' });
+        res.status(201).json(await usuarioModel.adicionar({ nome, email, senha_hash }));
+    },
 
     //----------------------------------------
     // Rotas - put
     //----------------------------------------
     async atualizar(req, res) {
-    const id = Number(req.params.id);
+        const id = Number(req.params.id);
 
-    if (!await usuarioModel.buscarPorId(id)) {
-        return res.status(404).json({ erro: 'Usuario não encontrado' });
-    }
+        if (!await usuarioModel.buscarPorId(id)) {
+            return res.status(404).json({ erro: 'Usuario não encontrado' });
+        }
 
-    if (await usuarioModel.buscarPorEmail(req.body.email, id)) {
-        return res.status(400).json({ erro: 'Email já cadastrado' });
-    }
+        if (await usuarioModel.buscarPorEmail(req.body.email, id)) {
+            return res.status(400).json({ erro: 'Email já cadastrado' });
+        }
 
-    const usuarioAtualizado = await usuarioModel.atualizar(id, req.body);
+        const usuarioAtualizado = await usuarioModel.atualizar(id, req.body);
 
-    res.json(usuarioAtualizado);
-},
+        res.json(usuarioAtualizado);
+    },
 
     //----------------------------------------
     // Rotas - delete
     //----------------------------------------
     async remover(req, res) {
-    const usuario = await usuarioModel.buscarPorId(Number(req.params.id));
-    if (!usuario) {
-        return res.status(404).json({ erro: 'Usuario não encontrado' });
-    }
+        const usuario = await usuarioModel.buscarPorId(Number(req.params.id));
+        if (!usuario) {
+            return res.status(404).json({ erro: 'Usuario não encontrado' });
+        }
 
-    if (await tarefaModel.contarPorUsuario(id) > 0) {
-        return res.status(400).json({ erro: 'Não é possível remover usuário com tarefas associadas' });
-    }
+        if (await tarefaModel.contarPorUsuario(id) > 0) {
+            return res.status(400).json({ erro: 'Não é possível remover usuário com tarefas associadas' });
+        }
 
-    const usuarioRemovido = await usuarioModel.remover(Number(req.params.id));
-    const { senha, ...usuarioSemSenha } = usuarioRemovido;
-    res.json({ mensagem: 'Usuario removida', usuario: usuarioSemSenha });
-},
+        const usuarioRemovido = await usuarioModel.remover(Number(req.params.id));
+        const { senha, ...usuarioSemSenha } = usuarioRemovido;
+        res.json({ mensagem: 'Usuario removida', usuario: usuarioSemSenha });
+    },
 }
 
 module.exports = usuariosController;

@@ -16,6 +16,7 @@ const autenticar = require('./src/middlewares/autenticar');
 const logger = require('./src/middlewares/logger'); 
 const validarContentType = require('./src/middlewares/validarContentType');
 const temporizador = require('./src/middlewares/temporizador');
+const criarErro = require("./src/utils/criarErro");
 
 
 //----------------------------------------
@@ -67,20 +68,17 @@ app.use('/usuarios', usuariosRoutes);
 app.use('/projetos', autenticar, projetosRoutes);
 
 //----------------------------------------
-// middleware - Error
-//----------------------------------------
-app.use(tratarErros);
-
-//----------------------------------------
 // Rota 404
 //----------------------------------------
 app.use((req, res) => {
-    res.status(404).json({
-        erro: 'Rota não encontrada',
-        metodo: req.method,
-        caminho: req.url,
-    });
+    const rota = `${req.method} ${req.url}`;
+    throw criarErro(404, `Rota não encontrada: ${rota}`);
 });
+
+//----------------------------------------
+// middleware - Error
+//----------------------------------------
+app.use(tratarErros);
 
 //----------------------------------------
 // app.listen 

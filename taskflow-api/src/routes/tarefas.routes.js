@@ -4,11 +4,13 @@
 const validar = require('../middlewares/validar');
 const schemas = require('../middlewares/schemas');
 
+
 //----------------------------------------
 // servidor com Express
 //----------------------------------------
 const express = require('express');
 const router = express.Router();
+const idValido = validar(schemas.id, 'params');
 
 //----------------------------------------
 // importando o controller
@@ -26,9 +28,9 @@ router.get('/estatisticas/resumo', tarefasController.resumo);
 //----------------------------------------
 // rotas/:id
 //----------------------------------------
-router.get('/:id', tarefasController.buscarPorId);
-router.put('/:id', validar(schemas.tarefa), tarefasController.atualizar);
-router.delete('/:id', tarefasController.remover);
+router.get('/:id', idValido, tarefasController.buscarPorId);
+router.put('/:id', idValido, validar(schemas.tarefa), tarefasController.atualizar);
+router.delete('/:id', idValido, tarefasController.remover);
 
 //----------------------------------------
 // exportando o router

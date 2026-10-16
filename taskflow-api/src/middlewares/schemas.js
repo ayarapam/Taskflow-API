@@ -1,10 +1,14 @@
 const schemas = {
+    id:{
+        obrigatorio: true,
+        tipo: "inteiro"
+    },
     tarefa: {
         texto: { obrigatorio: true, tipo: "string", minLength: 3 },
         coluna: { obrigatorio: true, tipo: "string", enum: ["afazer", "andamento", "concluido"] },
-        usuario_id: { obrigatorio: true, tipo: "number" },
-        projeto_id: { obrigatorio: true, tipo: "number" },
-        idprioridade: { obrigatorio: true, tipo: "number" },
+        usuario_id: { obrigatorio: true, tipo: "inteiro" },
+        projeto_id: { obrigatorio: true, tipo: "inteiro" },
+        idprioridade: { obrigatorio: true, tipo: "inteiro" },
     },
     usuario: {
         nome: { obrigatorio: true, tipo: "string", minLength: 3 },
@@ -15,6 +19,11 @@ const schemas = {
         nome: { obrigatorio: true, tipo: "string" },
         descricao: { obrigatorio: false, tipo: "string", maxLength: 200 },
     },
+    descricao: {
+            obrigatorio: false, 
+            tipo: "string", 
+            minLength: 200
+    }
 };
 
 module.exports = schemas; 

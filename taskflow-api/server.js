@@ -11,6 +11,7 @@ const tarefasRoutes = require('./src/routes/tarefas.routes');
 const usuariosRoutes = require('./src/routes/usuarios.routes');
 const projetosRoutes = require('./src/routes/projetos.routes');
 const authRoutes = require ('./src/routes/auth.routes.js')
+const tratarErros = require('./src/middlewares/erro.middleware');
 const autenticar = require('./src/middlewares/autenticar');
 const logger = require('./src/middlewares/logger'); 
 const validarContentType = require('./src/middlewares/validarContentType');
@@ -62,8 +63,13 @@ app.use(temporizador);
 //----------------------------------------
 app.use('/auth', authRoutes);
 app.use('/tarefas', autenticar, tarefasRoutes);
-app.use('/usuarios', autenticar, usuariosRoutes);
+app.use('/usuarios', usuariosRoutes);
 app.use('/projetos', autenticar, projetosRoutes);
+
+//----------------------------------------
+// middleware - Error
+//----------------------------------------
+app.use(tratarErros);
 
 //----------------------------------------
 // Rota 404

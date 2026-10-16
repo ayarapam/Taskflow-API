@@ -1,5 +1,6 @@
 const tarefaModel = require('../models/tarefa.model');
 const usuarioModel = require('../models/usuario.model');
+const criarErro = require('../utils/criarErro');
 
 //----------------------------------------
 // Arrays
@@ -38,7 +39,7 @@ const tarefasController = {
     //----------------------------------------
     async buscarPorId(req, res) {
         const tarefa = await tarefaModel.buscarPorId(parseInt(req.params.id));
-        if (!tarefa) return res.status(404).json({ erro: 'Tarefa não encontrada' });
+        if (!tarefa) {throw criarErro(404, 'Tarefa não encontrada')};
         res.json(tarefa);
     },
 
@@ -59,8 +60,11 @@ const tarefasController = {
     //----------------------------------------
     async atualizar(req, res) {
         const id = parseInt(req.params.id);
+
         const atualizada = await tarefaModel.atualizar(id, req.body);
-        if (!atualizada) return res.status(404).json({ erro: 'Tarefa não encontrada' });
+
+        if (!atualizada) {throw criarErro(404, 'Tarefa não encontrada')};
+
         res.json(atualizada);
     },
 
@@ -71,10 +75,11 @@ const tarefasController = {
         const removida = await tarefaModel.remover(parseInt(req.params.id));
 
         if (!removida) {
-            return res.status(404).json({ erro: 'Tarefa não encontrada' });
+            throw criarErro(404, 'Tarefa não encontrada');
         }
 
         res.json({ mensagem: 'Tarefa removida', tarefa: removida });
+        
     },
 };
 

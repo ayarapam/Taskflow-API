@@ -42,11 +42,21 @@ const projetosController = {
     //----------------------------------------
     //vincular usuario com tarefa
     async criar(req, res) {
+        console.log('Usuário autenticado:', req.usuario);
         const { nome, descricao, ativo } = req.body;
         if (!nome) {
             return res.status(400).json({ erro: 'Nome é obrigatório' });
         }
-        res.status(201).json(await projetoModel.adicionar(nome, descricao, ativo));
+
+        const usuarioId = req.usuario.id;
+
+        const projeto = await projetoModel.adicionar(
+            nome,
+            descricao,
+            ativo,
+            usuarioId
+        );
+        res.status(201).json(projeto);
     },
 
     //----------------------------------------

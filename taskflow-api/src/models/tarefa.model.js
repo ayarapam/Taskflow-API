@@ -8,9 +8,11 @@ module.exports = {
         );
         return result.rows;
     },
-    listarPorColuna: (coluna) => tarefas.filter(t => t.coluna === coluna),
-    listarPorUsuario: (usuario_id) => tarefas.filter(t => t.usuario_id === usuario_id),
-    listarPorProjeto: (projeto_id) => tarefas.filter(t => t.projeto_id === projeto_id),
+
+    // listarPorColuna: (coluna) => tarefas.filter(t => t.coluna === coluna),
+    // listarPorUsuario: (usuario_id) => tarefas.filter(t => t.usuario_id === usuario_id),
+    // listarPorProjeto: (projeto_id) => tarefas.filter(t => t.projeto_id === projeto_id),
+    
     buscarPorId: async (id) => {
         const result = await pool.query(
             'SELECT * FROM tarefas WHERE id = $1',
@@ -41,48 +43,35 @@ module.exports = {
         andamento: lista.filter(t => t.coluna === 'andamento').length,
         concluido: lista.filter(t => t.coluna === 'concluido').length,
     }),
-    // estatisticas: () => {
-    //     const totalTarefa = tarefas.length;
-    //     const porColuna = {
-    //         afazer: tarefas.filter(t => t.coluna === 'afazer').length,
-    //         andamento: tarefas.filter(t => t.coluna === 'andamento').length,
-    //         concluido: tarefas.filter(t => t.coluna === 'concluido').length
-    //     };
-    //     const porPrioridade = {
-    //         baixa: tarefas.filter(t => t.prioridade === 'baixa').length,
-    //         media: tarefas.filter(t => t.prioridade === 'media').length,
-    //         alta: tarefas.filter(t => t.prioridade === 'alta').length
-    //     }
-    //     const comMaisTarefas = Object.entries(porColuna).sort((a, b) => b[1])[0][0];
-    //     return {
-    //         totalTarefa,
-    //         porColuna,
-    //         porPrioridade,
-    //         'Mais tarefas': comMaisTarefas
-    //     };
-    // },
-    // resumo: () => {
-    //     const total = tarefas.length;
-    //     const afazer = tarefas.filter(t => t.coluna === 'afazer').length
-    //     const andamento = tarefas.filter(t => t.coluna === 'andamento').length
-    //     const concluido = tarefas.filter(t => t.coluna === 'concluido').length
-    //     const prioridades = {
-    //         baixa: tarefas.filter(t => t.prioridade === 'baixa').length,
-    //         media: tarefas.filter(t => t.prioridade === 'media').length,
-    //         alta: tarefas.filter(t => t.prioridade === 'alta').length
-    //     };
-    //     const prioridadeComun = Object.entries(prioridades).sort((a, b) => b[1] - a[1])[0][0];
-    //     return `Você tem ${total} tarefa(s): ${concluido} conluída(s), ${andamento} em adamento e ${afazer} a fazer. Prioridade mais comum: ${prioridadeComun}`;
-    // },
 
     atualizar: async (id, dados) => {
-        const { texto, prioridade, coluna, usuario_id } = dados;
+        const tarefaAtual = await pool.query('SELECT * FROM tarefas WHERE id = $1', [id]);
+        const concluidoEm = dados.coluna === 'concluido' ? new Date() : null;
+
+        let iniciadoEm = tarefaAtual.rows[0].iniciada_em;
+
+        if (tarefaAtual.rows[0].coluna === 'andamento' && dados.coluna === 'afazer') {
+            iniciadoEm = null;
+        } else if (tarefaAtual.rows[0].coluna === 'afazer' && dados.coluna === 'andamento') {
+            iniciadoEm = new Date();
+        };
+
         const result = await pool.query(
-            'UPDATE tarefas SET texto=$1,prioridade=$2,coluna=$3,usuario_id=$4 WHERE id=$5 RETURNING *',
-            [texto, prioridade, coluna, usuario_id, id]
+            `UPDATE tarefas SET 
+                texto=$1,
+                coluna=$2,
+                usuario_id=$3,
+                projeto_id=$4,
+                idprioridade=$5,
+                concluido_em=$6,
+                iniciada_em=$7
+            WHERE id=$8 
+            RETURNING *`,
+            [dados.texto, dados.coluna, dados.usuario_id, dados.projeto_id, dados.idprioridade, concluidoEm, iniciadoEm, id]
         );
         return result.rows[0] || null;
     },
+
     remover: async (id) => {
         const result = await pool.query('DELETE FROM tarefas WHERE id=$1 RETURNING *', [id]);
         return result.rows[0] || null;

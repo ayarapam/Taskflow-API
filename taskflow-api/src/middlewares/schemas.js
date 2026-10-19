@@ -1,7 +1,6 @@
 const schemas = {
     id:{
-        obrigatorio: true,
-        tipo: "inteiro"
+        id:{obrigatorio: true, tipo: "inteiro"}
     },
     tarefa: {
         texto: { obrigatorio: true, tipo: "string", minLength: 3 },

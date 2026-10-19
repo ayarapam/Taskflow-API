@@ -12,11 +12,11 @@ module.exports = {
         const result = await pool.query('SELECT * FROM projetos WHERE id = $1', [id]);
         return result.rows[0] || null;
     },
-    adicionar: async (nome, descricao, ativo) => {
+    adicionar: async (nome, descricao, ativo, usuario_id) => {
         console.log('ativo:', ativo);
         const result = await pool.query(
-            'INSERT INTO projetos (nome, descricao, ativo) VALUES ($1, $2, $3) RETURNING *',
-            [nome, descricao, ativo ?? true]
+            'INSERT INTO projetos (nome, descricao, ativo, usuario_id) VALUES ($1, $2, $3, $4) RETURNING *',
+            [nome, descricao, ativo ?? true, usuario_id]
         );
         return result.rows[0];
     },

@@ -4,7 +4,6 @@
 const validar = require('../middlewares/validar');
 const schemas = require('../middlewares/schemas');
 
-
 //----------------------------------------
 // servidor com Express
 //----------------------------------------
@@ -24,6 +23,7 @@ router.get('/', tarefasController.listar);
 router.post('/', validar(schemas.tarefa), tarefasController.criar);
 router.get('/estatisticas', tarefasController.estatisticas);
 router.get('/estatisticas/resumo', tarefasController.resumo);
+// router.get('/prioridades', tarefasController.listarPrioridades);
 
 //----------------------------------------
 // rotas/:id

@@ -8,27 +8,28 @@ function validar(schema, origem) {
         for (const campo in schema) {
             const regras = schema[campo];
             const valor = dados[campo];
-            const ausente = valor === undefined || valor === null || valor === '';
+            const ausente = valor === undefined || valor === null || valor === "";
 
             if (regras.obrigatorio && ausente) {
                 erros.push(`O campo '${campo}' é obrigatório`);
                 continue;
             }
 
-            if (ausente) continue;
+            //if (ausente) continue;
 
             if (regras.tipo === 'inteiro') {
-                const numero = typeof valor === 'string'
-                    ? Number(valor) : valor;
+                const numero = typeof valor === "string" ? Number(valor) : valor;
 
                 if (!Number.isInteger(numero) || numero <= 0) {
                     erros.push(`O campo '${campo}' deve ser um número inteiro`);
                 }
+
             } else if (regras.tipo && typeof valor !== regras.tipo) {
+                console.log('tipo de valor', typeof valor);
                 erros.push(
                     `O campo '${campo}' deve ser do tipo ${regras.tipo}`);
             }
-            
+
             if (regras.enum && !regras.enum.includes(valor)) {
                 erros.push(
                     `O campo '${campo}' deve ser um de: ${regras.enum.join(', ')}`
@@ -54,8 +55,7 @@ function validar(schema, origem) {
 
         }
 
-        if (erros.length > 0)
-            throw criarErro(400, 'Dados inválidos', erros);
+        if (erros.length > 0) throw criarErro(400, 'Dados inválidos', erros);
         next();
     };
 }

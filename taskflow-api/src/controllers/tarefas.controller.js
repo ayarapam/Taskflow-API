@@ -17,12 +17,18 @@ const tarefasController = {
     // Rotas - get
     //----------------------------------------
     async listar(req, res) {
-        const { coluna, usuarioId } = req.query;
+        const { coluna, usuario_id } = req.query;
         let resultado = await tarefaModel.listar();
         if (coluna) resultado = resultado.filter(t => t.coluna === coluna);
-        if (usuarioId) resultado = resultado.filter(t => t.usuarioId === parseInt(usuarioId));
+        if (usuario_id) resultado = resultado.filter(t => t.usuario_id === parseInt(usuario_id));
         res.json(resultado);
     },
+
+    // async listarPrioridades(req, res) {
+    //     const {descricao, ativo} = req.query;
+    //     let resultado = await tarefaModel.listarPrioridades();
+    //     res.json(resultado);
+    // },
 
     async estatisticas(req, res) {
         const estatisticas = await tarefaModel.estatisticas();
@@ -46,14 +52,13 @@ const tarefasController = {
     //----------------------------------------
     // Rotas - POST
     //----------------------------------------
-    async criar(req, res) {
-        const dados = {
-            ...req.body,
-            usuario_id: req.usuario.id, 
-        };
+     async criar(req, res) {
+    const { texto, idprioridade, coluna, usuario_id, projeto_id, ordem } =
+      req.body;
 
-        res.status(201).json(await tarefaModel.adicionar(dados));
-    },
+    res.status(201).json(await tarefaModel.adicionar(req.body));
+  },
+
 
     //----------------------------------------
     // Rotas - PUT

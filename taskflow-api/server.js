@@ -1,6 +1,5 @@
 
 console.log('TaskFlow API — pronto para o Express!')
-
 require('dotenv').config();
 const express = require('express');
 
@@ -18,7 +17,6 @@ const logger = require('./src/middlewares/logger');
 const validarContentType = require('./src/middlewares/validarContentType');
 const temporizador = require('./src/middlewares/temporizador');
 const criarErro = require("./src/utils/criarErro");
-
 
 //----------------------------------------
 // cors

@@ -1,5 +1,6 @@
 const projetoModel = require('../models/projetos.model');
 const usuarioModel = require('../models/usuario.model');
+const criarErro = require('../utils/criarErro');
 
 //----------------------------------------
 // Controller
@@ -19,43 +20,36 @@ const projetosController = {
     async buscarPorId(req, res) {
         const projeto = await projetoModel.buscarPorId(parseInt(req.params.id));
         if (!projeto) {
-            return res.status(404).json({ erro: 'Projeto não encontrado' });
+            throw criarErro(404, 'Projeto não encontrado');
         }
         res.json(projeto);
     },
 
-    async resumo(req, res) {
-        const projeto = await projetoModel.buscarPorId(parseInt(req.params.id));
-        if (!projeto) return res.status(404).json({ erro: 'Projeto não encontrado' });
+  async resumo(req, res) {
+    const projeto = await projetoModel.buscar(parseInt(req.params.id));
+    if (!projeto){
+      throw criarErro(404, 'Projeto não encontrado');
+    }
+    const tarefas = await tarefaModel.listarPorProjeto(projeto.id);
 
-        const tarefas = await tarefaModel.listarPorProjeto(projeto.id);
-
-        res.json({
-            projeto,
-            totalTarefas: tarefas.length,
-            porColuna: await tarefaModel.totalPorColuna(tarefas),
-        });
-    },
+    res.json({
+      projeto,
+      totalTarefas: tarefas.length,
+      porColuna: await tarefaModel.totalPorColuna(tarefas),
+    });
+  },
 
     //----------------------------------------
     // rotas - post
     //----------------------------------------
     //vincular usuario com tarefa
     async criar(req, res) {
-        console.log('Usuário autenticado:', req.usuario);
-        const { nome, descricao, ativo } = req.body;
+        const { nome } = req.body;
         if (!nome) {
             return res.status(400).json({ erro: 'Nome é obrigatório' });
         }
 
-        const usuarioId = req.usuario.id;
-
-        const projeto = await projetoModel.adicionar(
-            nome,
-            descricao,
-            ativo,
-            usuarioId
-        );
+        const projeto = await projetoModel.adicionar(req.body);
         res.status(201).json(projeto);
     },
 
@@ -65,7 +59,7 @@ const projetosController = {
     async atualizar(req, res) {
         const atualizada = await projetoModel.atualizar(parseInt(req.params.id), req.body);
         if (!atualizada) {
-            return res.status(404).json({ erro: 'Projeto não encontrado' });
+            throw criarErro(404, 'Projeto não encontrado');
         }
         res.json(atualizada);
     },
@@ -77,12 +71,12 @@ const projetosController = {
         const id = parseInt(req.params.id);
 
         if (!projetoModel.buscar(id))
-            return res.status(404).json({ erro: 'Projeto não encontrado' });
+            throw criarErro(404, 'Projeto não encontrado');
 
         if (tarefaModel.contarPorProjeto(id) > 0)
-            return res.status(400).json({
-                erro: 'Projeto possui tarefas associadas. Remova as tarefas antes de deletar o projeto.',
-            });
+            throw criarErro(400,
+                'Projeto possui tarefas associadas. Remova as tarefas antes de deletar o projeto.',
+            );
 
         const removido = projetoModel.remover(id);
         res.json({ mensagem: 'Projeto removido', projeto: removido });

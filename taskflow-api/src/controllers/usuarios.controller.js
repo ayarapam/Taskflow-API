@@ -1,5 +1,6 @@
 const usuarioModel = require('../models/usuario.model');
 const tarefaModel = require('../models/tarefa.model');
+const criarErro = require('../utils/criarErro');
 
 //----------------------------------------
 // controller
@@ -21,11 +22,10 @@ const usuariosController = {
     // Rotas/:id
     //----------------------------------------
     async buscarPorId(req, res) {
-        const usuario = await usuarioModel.buscarPorId(Number(req.params.id));
+        const usuario = await usuarioModel.buscar(parseInt(req.params.id));
 
         if (!usuario)
-            return res.status(404).json({ erro: 'Usuário não encontrado' });
-
+            throw criarErro(404, 'Usuário não encontrado');
         res.json(usuario);
     },
 
@@ -35,7 +35,7 @@ const usuariosController = {
     async criar(req, res) {
         const { nome, email, senha_hash } = req.body;
         if (await usuarioModel.buscarPorEmail(email))
-            return res.status(400).json({ erro: 'Email já cadastrado' });
+            throw criarErro(400, 'Email já cadastrado');
         res.status(201).json(await usuarioModel.adicionar({ nome, email, senha_hash }));
     },
 
@@ -43,37 +43,23 @@ const usuariosController = {
     // Rotas - put
     //----------------------------------------
     async atualizar(req, res) {
-        const id = Number(req.params.id);
-
-        if (!await usuarioModel.buscarPorId(id)) {
-            return res.status(404).json({ erro: 'Usuario não encontrado' });
-        }
-
-        if (await usuarioModel.buscarPorEmail(req.body.email, id)) {
-            return res.status(400).json({ erro: 'Email já cadastrado' });
-        }
-
-        const usuarioAtualizado = await usuarioModel.atualizar(id, req.body);
-
-        res.json(usuarioAtualizado);
+        const atualizado = await usuarioModel.atualizar(parseInt(req.params.id), req.body);
+        if (!atualizado) throw criarErro(404, 'Usuário não encontrado');
+        res.json(atualizado);
     },
 
     //----------------------------------------
     // Rotas - delete
     //----------------------------------------
     async remover(req, res) {
-        const usuario = await usuarioModel.buscarPorId(Number(req.params.id));
-        if (!usuario) {
-            return res.status(404).json({ erro: 'Usuario não encontrado' });
-        }
+        const id = parseInt(req.params.id);
 
+        const removido = await usuarioModel.remover(id);
+        if (!removido) throw criarErro(404, 'Usuário não encontrado');
         if (await tarefaModel.contarPorUsuario(id) > 0) {
-            return res.status(400).json({ erro: 'Não é possível remover usuário com tarefas associadas' });
+            throw criarErro(400, 'Não é possível remover usuário com tarefas associadas');
         }
-
-        const usuarioRemovido = await usuarioModel.remover(Number(req.params.id));
-        const { senha, ...usuarioSemSenha } = usuarioRemovido;
-        res.json({ mensagem: 'Usuario removida', usuario: usuarioSemSenha });
+        res.json({ mensagem: 'Usuário removido', usuario: removido });
     },
 }
 

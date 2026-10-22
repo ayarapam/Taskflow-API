@@ -17,6 +17,7 @@ const logger = require('./src/middlewares/logger');
 const validarContentType = require('./src/middlewares/validarContentType');
 const temporizador = require('./src/middlewares/temporizador');
 const criarErro = require("./src/utils/criarErro");
+const pool = require('./src/database/db');
 
 //----------------------------------------
 // cors
@@ -47,9 +48,6 @@ app.use(cors({
 //
 //----------------------------------------
 app.use(express.json());
-app.get('/', (req, res)=>{
-    res.json({api: 'taskflow', versão:'1.0', status:'online'});
-});
 
 //----------------------------------------
 // Middlewares
@@ -57,6 +55,15 @@ app.get('/', (req, res)=>{
 app.use(validarContentType);
 app.use(logger);
 app.use(temporizador);
+
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) console.error('Erro ao conectar:', err.message);
+  else     console.log('Banco conectado:', res.rows[0].now);
+});
+
+app.get('/', (req, res)=>{
+    res.json({api: 'taskflow', versão:'1.0', status:'online'});
+});
 
 //----------------------------------------
 // Rotas

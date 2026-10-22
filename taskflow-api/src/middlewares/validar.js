@@ -25,7 +25,6 @@ function validar(schema, origem) {
                 }
 
             } else if (regras.tipo && typeof valor !== regras.tipo) {
-                console.log('tipo de valor', typeof valor);
                 erros.push(
                     `O campo '${campo}' deve ser do tipo ${regras.tipo}`);
             }

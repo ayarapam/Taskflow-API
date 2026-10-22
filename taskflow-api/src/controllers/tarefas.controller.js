@@ -2,6 +2,7 @@ const tarefaModel = require('../models/tarefa.model');
 const usuarioModel = require('../models/usuario.model');
 const criarErro = require('../utils/criarErro');
 
+
 //----------------------------------------
 // Arrays
 //----------------------------------------
@@ -31,8 +32,7 @@ const tarefasController = {
     // },
 
     async estatisticas(req, res) {
-        const estatisticas = await tarefaModel.estatisticas();
-        res.json(estatisticas);
+        res.json(tarefaModel.estatisticas(req.query.coluna));
     },
 
     async resumo(req, res) {
@@ -45,19 +45,16 @@ const tarefasController = {
     //----------------------------------------
     async buscarPorId(req, res) {
         const tarefa = await tarefaModel.buscarPorId(parseInt(req.params.id));
-        if (!tarefa) {throw criarErro(404, 'Tarefa não encontrada')};
+        if (!tarefa) { throw criarErro(404, 'Tarefa não encontrada') };
         res.json(tarefa);
     },
 
     //----------------------------------------
     // Rotas - POST
     //----------------------------------------
-     async criar(req, res) {
-    const { texto, idprioridade, coluna, usuario_id, projeto_id, ordem } =
-      req.body;
-
-    res.status(201).json(await tarefaModel.adicionar(req.body));
-  },
+    async criar(req, res) {
+        res.status(201).json(await tarefaModel.adicionar(req.body));
+    },
 
 
     //----------------------------------------
@@ -68,7 +65,7 @@ const tarefasController = {
 
         const atualizada = await tarefaModel.atualizar(id, req.body);
 
-        if (!atualizada) {throw criarErro(404, 'Tarefa não encontrada')};
+        if (!atualizada) { throw criarErro(404, 'Tarefa não encontrada') };
 
         res.json(atualizada);
     },
@@ -84,7 +81,7 @@ const tarefasController = {
         }
 
         res.json({ mensagem: 'Tarefa removida', tarefa: removida });
-        
+
     },
 };
 

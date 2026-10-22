@@ -5,7 +5,7 @@ const pool = require('../database/db');
 
 module.exports = {
     listar: async () => {
-        const result = await pool.query('SELECT * FROM projetos');
+        const result = await pool.query('SELECT * FROM projetos ORDER BY nome');
         return result.rows;
     },
     buscarPorId: async (id) => {
@@ -16,13 +16,18 @@ module.exports = {
         console.log('ativo:', ativo);
         const result = await pool.query(
             'INSERT INTO projetos (nome, descricao, ativo, usuario_id) VALUES ($1, $2, $3, $4) RETURNING *',
-            [nome, descricao, ativo ?? true, usuario_id]
+            [nome, descricao || null, usuario_id]
         );
         return result.rows[0];
     },
     atualizar: async (id, dados) => {
         const result = await pool.query(
-            'UPDATE projetos SET nome=$1, descricao=$2, ativo=$3 WHERE id=$4 RETURNING *',
+            `UPDATE projetos SET
+             nome       = COALESCE($1, nome),
+             descricao  = COALESCE($2, descricao),
+             usuario_id = COALESCE($3, usuario_id)
+            WHERE id = $4
+         RETURNING *`,
             [dados.nome, dados.descricao, dados.ativo, id]
         );
         return result.rows[0] || null;

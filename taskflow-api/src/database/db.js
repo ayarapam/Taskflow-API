@@ -7,5 +7,3 @@ const pool = new Pool({
 
 module.exports = pool;
 
-// Este arquivo é importado pelos models:
-// const pool = require('../database/db');

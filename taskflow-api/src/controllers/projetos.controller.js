@@ -1,4 +1,5 @@
 const projetoModel = require('../models/projetos.model');
+const tarefaModel = require('../models/tarefa.model');
 const usuarioModel = require('../models/usuario.model');
 const criarErro = require('../utils/criarErro');
 
@@ -44,14 +45,20 @@ const projetosController = {
     //----------------------------------------
     //vincular usuario com tarefa
     async criar(req, res) {
-        const { nome } = req.body;
-        if (!nome) {
-            return res.status(400).json({ erro: 'Nome é obrigatório' });
-        }
+    const { nome, descricao, usuario_id } = req.body;
 
-        const projeto = await projetoModel.adicionar(req.body);
-        res.status(201).json(projeto);
-    },
+    if (!nome) {
+        throw criarErro(400, 'Nome é obrigatório');
+    }
+
+    const projeto = await projetoModel.adicionar(
+        nome,
+        descricao,
+        usuario_id
+    );
+
+    res.status(201).json(projeto);
+},
 
     //----------------------------------------
     // rotas - put
@@ -70,7 +77,7 @@ const projetosController = {
     async remover(req, res) {
         const id = parseInt(req.params.id);
 
-        if (!projetoModel.buscar(id))
+        if (!projetoModel.buscarPorId(id))
             throw criarErro(404, 'Projeto não encontrado');
 
         if (tarefaModel.contarPorProjeto(id) > 0)

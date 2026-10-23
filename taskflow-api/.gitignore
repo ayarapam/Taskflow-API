@@ -14,3 +14,4 @@ npm-debug.log*
 
 #dicas para saber oque colocar no git ignora
 #https://gitignore.io/
+/src/generated/prisma

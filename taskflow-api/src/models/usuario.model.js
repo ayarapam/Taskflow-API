@@ -1,21 +1,21 @@
 
-const { buscarPorId } = require('../controllers/tarefas.controller');
+//const { buscarPorId } = require('../controllers/tarefas.controller');
 const pool = require('../database/db');
 const prisma = require('../database/prisma');
 
-const incluirNomes = {
-    tarefas: { select: { nome: true } },
-    projetos: { select: { nome: true } },
-};
+// const incluirNomes = {
+//     tarefas: { select: { texto: true } },
+//     projetos: { select: { nome: true } },
+// };
 
-function formatarUsuario(usuario) {
-    const { tarefas, usuarios, ...resto } = usuario;
-    return {
-        ...resto,
-        tarefa: tarefas?.texto,
-        projeto: prisma.projetos?.nome
-    };
-};
+// function formatarUsuario(usuario) {
+//     const { tarefas, projetos, ...resto } = usuario;
+//     return {
+//         ...resto,
+//         tarefa: tarefas?.texto,
+//         projeto: projetos?.nome
+//     };
+// };
 
 
 module.exports = {
@@ -31,7 +31,7 @@ module.exports = {
             },
             orderBy: { id: 'asc' },
         });
-        return lista.map(formatarUsuario);
+        return lista;
     },
 
 
@@ -44,10 +44,10 @@ module.exports = {
                 id: true,
                 nome: true,
                 email: true,
-                include: incluirNomes,
+                //include: incluirNomes,
             },
         });
-        return usuario ? formatarTarefa(usuario) : null;
+        return usuario //? formatarUsuario(usuario) : null;
     },
 
     buscarPorEmail: async (email) => {
@@ -73,7 +73,7 @@ module.exports = {
 
             },
         });
-        return formatarUsuario(result);
+        return result;
     },
 
     atualizar: async (id, dados) => {
@@ -91,7 +91,7 @@ module.exports = {
                 senha_hash: dados.senha_hash,
             },
         });
-        return formatarUsuario(usuario)
+        return usuario;
     },
 
     remover: async (id) => {
@@ -101,7 +101,7 @@ module.exports = {
             const usuario = await prisma.usuarios.delete({
                 where: { id: id },
             });
-            return formatarUsuario(usuario);
+            return usuario;
 
         } catch (erro) {
             if (erro.code === 'P2025'){

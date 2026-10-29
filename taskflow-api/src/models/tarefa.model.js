@@ -24,55 +24,21 @@ const tarefaModel = {
     listar: async () => {
         const lista = await prisma.tarefas.findMany({
             select: {
-            id: true,
-            texto: true,
-            coluna: true,
-            usuario_id: true,
-            projeto_id: true,
-            idprioridade: true,
-            concluida_em: true,
-            iniciada_em: true,
-            ordem: true,
-            ...incluirNomes,
+                id: true,
+                texto: true,
+                coluna: true,
+                usuario_id: true,
+                projeto_id: true,
+                idprioridade: true,
+                concluida_em: true,
+                iniciada_em: true,
+                ordem: true,
+                ...incluirNomes,
             },
             orderBy: { id: 'asc' },
         });
         return lista.map(formatarTarefa);
     },
-
-    // listar: async () => {
-    //     const result = await prisma.tarefas.findMany({
-    //         select: {
-    //             id: true,
-    //             texto: true,
-    //             coluna: true,
-    //             usuario_id: true,
-    //             projeto_id: true,
-    //             idprioridade: true,
-    //             concluida_em: true,
-    //             iniciada_em: true,
-    //             ordem: true,
-    //             prioridades: {
-    //                 select: {
-    //                     descricao: true,
-    //                     cor: true
-    //                 },
-    //             },
-    //             projetos: {
-    //                 select: {
-    //                     nome: true
-    //                 }
-    //             },
-    //             usuarios: {
-    //                 select: {
-    //                     nome: true
-    //                 }
-    //             }
-    //         },
-    //         orderBy: { id: 'asc' }
-    //     });
-    //     return result;
-    // },
 
     listarPorColuna: async (coluna) => {
         const result = await pool.query(
@@ -98,31 +64,34 @@ const tarefaModel = {
         return result.rows;
     },
 
-    buscarPorId: async (id) =>{
+    buscarPorId: async (id) => {
         const tarefa = await prisma.tarefas.findUnique({
-            where: {id},
+            where: { id },
             include: incluirNomes,
         });
         return tarefa ? formatarTarefa(tarefa) : null;
     },
 
-    // buscarPorId: async (id) => {
-    //     const result = await pool.query(
-    //         `SELECT t.*, p.nome as projeto, u.nome as usuario, pr.descricao as prioridade, pr.cor as prioridade_cor FROM tarefas t
-    //         inner join projetos p on t.projeto_id = p.id 
-    //         inner join usuarios u on t.usuario_id = u.id 
-    //         inner join prioridades pr on t.idprioridade = pr.id 
-    //         WHERE t.id = $1`, [id]
-    //     );
-    //     return result.rows[0] || null;
-    // },
-
-    adicionar: async ({ texto, idprioridade, coluna, usuario_id, projeto_id, ordem }) => {
-        const result = await pool.query(
-            'INSERT INTO tarefas (texto,idprioridade,coluna,usuario_id,projeto_id,ordem) VALUES ($1,$2,$3,$4,$5,$6)RETURNING id',
-            [texto, idprioridade || 2, coluna || 'afazer', usuario_id, projeto_id, ordem || 0]
-        );
-        return result.rows[0];
+    adicionar: async ({
+        texto,
+        idprioridade,
+        coluna,
+        usuario_id,
+        projeto_id,
+        ordem,
+    }) => {
+        const result = await prisma.tarefas.create({
+            data: {
+                texto: texto,
+                idprioridade: idprioridade || 2,
+                coluna: coluna || "afazer",
+                usuario_id: usuario_id,
+                projeto_id: projeto_id,
+                ordem: ordem || 0,
+            },
+            include: incluirNomes
+        });
+        return formatarTarefa(result);
     },
 
     estatisticas: async (filtroColuna) => {
@@ -173,39 +142,55 @@ const tarefaModel = {
     }),
 
     atualizar: async (id, dados) => {
-        const resultadoAtual = await pool.query('SELECT * FROM tarefas WHERE id = $1', [id]);
-        const tarefaAtual = resultadoAtual.rows[0];
+        const tarefaAtual = await prisma.tarefas.findUnique({
+            where: { id }
+        });
         if (!tarefaAtual) return null;
 
-        const concluidaEm = dados.coluna === 'concluido' ? new Date() : null;
+        const finalizadaEm = dados.coluna === "concluido" ? new Date() : null;
 
         let iniciadaEm = tarefaAtual.iniciada_em;
-        if (tarefaAtual.coluna === 'andamento' && dados.coluna === 'afazer') {
+
+        if (tarefaAtual.coluna === "andamento" && dados.coluna === "afazer") {
             iniciadaEm = null;
-        } else if (tarefaAtual.coluna === 'afazer' && dados.coluna === 'andamento') {
+        } else if (
+            tarefaAtual.coluna === "afazer" &&
+            dados.coluna === "andamento"
+        ) {
             iniciadaEm = new Date();
         }
 
-        await pool.query(
-            `UPDATE tarefas SET
-                texto        = $1,
-                coluna       = $2,
-                usuario_id   = $3,
-                projeto_id   = $4,
-                idprioridade = $5,
-                concluida_em = $6,
-                iniciada_em  = $7
-            WHERE id = $8`,
-            [dados.texto, dados.coluna, dados.usuario_id, dados.projeto_id,
-            dados.idprioridade, concluidaEm, iniciadaEm, id]
-        );
+        const tarefa = await prisma.tarefas.update({
+            where: { id },
+            data: {
+                texto: dados.texto,
+                coluna: dados.coluna,
+                idprioridade: dados.idprioridade,
+                usuario_id: dados.usuario_id,
+                projeto_id: dados.projeto_id,
+                iniciada_em: iniciadaEm,
+                concluida_em: finalizadaEm,
+            },
+            include: incluirNomes,
+        });
 
-        return tarefaModel.buscarPorId(id);
+        return formatarTarefa(tarefa)
     },
 
     remover: async (id) => {
-        const result = await pool.query('DELETE FROM tarefas WHERE id=$1 RETURNING id', [id]);
-        return result.rows[0] || null;
+        try {
+            const tarefa = await prisma.tarefas.delete({
+                where: { id: id },
+                include: incluirNomes,
+            });
+            return formatarTarefa(tarefa);
+
+        } catch (erro) {
+            if (erro.code === 'P2025'){
+                return null;
+            }
+            throw erro;
+        }
     },
 
 };

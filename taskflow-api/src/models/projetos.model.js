@@ -1,8 +1,8 @@
 //----------------------------------------
 // variáveis
 //----------------------------------------
-const { buscarPorId } = require('../controllers/tarefas.controller');
-const pool = require('../database/db');
+//const { buscarPorId } = require('../controllers/tarefas.controller');
+//const pool = require('../database/db');
 const prisma = require("../database/prisma")
 
 const incluir = {

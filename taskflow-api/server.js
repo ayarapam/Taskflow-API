@@ -19,6 +19,9 @@ const temporizador = require('./src/middlewares/temporizador');
 const criarErro = require("./src/utils/criarErro");
 const pool = require('./src/database/db');
 
+const swaggerUi = require('swagger-ui-express');
+const openapi = require('./src/docs/openapi');
+
 //----------------------------------------
 // cors
 //----------------------------------------
@@ -73,6 +76,8 @@ app.use('/tarefas', autenticar, tarefasRoutes);
 app.use('/usuarios', usuariosRoutes);
 app.use('/projetos', autenticar, projetosRoutes);
 app.use('/prioridades', autenticar, prioridadesRoutes);
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi));
 //----------------------------------------
 // Rota 404
 //----------------------------------------

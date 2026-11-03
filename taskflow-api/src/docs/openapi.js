@@ -1,3 +1,7 @@
+const tarefas = require('./tarefas.docs');
+const comum = require('./comum');
+
+
 module.exports = {
     openapi: '3.0.3',
     info: {
@@ -6,5 +10,18 @@ module.exports = {
         description: 'API do TaskFlow - SENAI CTGAS-ER',
     },
     servers: [{url: 'http://localhost:3000', description: 'Local'}], 
-    paths: {},
-}
+    security: [{ bearerAuth: [] }],
+
+    paths: { ...tarefas.paths },
+
+    components:{
+        schemas: { ...comum.schemas, ...tarefas.schemas },
+        securitySchemes:{
+            bearerAuth:{
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT',
+            },
+        },
+    },
+};

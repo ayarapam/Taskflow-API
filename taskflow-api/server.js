@@ -10,10 +10,10 @@ const tarefasRoutes = require('./src/routes/tarefas.routes');
 const usuariosRoutes = require('./src/routes/usuarios.routes');
 const projetosRoutes = require('./src/routes/projetos.routes');
 const prioridadesRoutes = require('./src/routes/prioridades.routes');
-const authRoutes = require ('./src/routes/auth.routes.js')
+const authRoutes = require('./src/routes/auth.routes.js')
 const tratarErros = require('./src/middlewares/erro.middleware');
 const autenticar = require('./src/middlewares/autenticar');
-const logger = require('./src/middlewares/logger'); 
+const logger = require('./src/middlewares/logger');
 const validarContentType = require('./src/middlewares/validarContentType');
 const temporizador = require('./src/middlewares/temporizador');
 const criarErro = require("./src/utils/criarErro");
@@ -21,6 +21,9 @@ const pool = require('./src/database/db');
 
 const swaggerUi = require('swagger-ui-express');
 const openapi = require('./src/docs/openapi');
+const SWAGGER_CDN =
+    'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14';
+
 
 //----------------------------------------
 // cors
@@ -60,12 +63,12 @@ app.use(logger);
 app.use(temporizador);
 
 pool.query('SELECT NOW()', (err, res) => {
-  if (err) console.error('Erro ao conectar:', err.message);
-  else     console.log('Banco conectado:', res.rows[0].now);
+    if (err) console.error('Erro ao conectar:', err.message);
+    else console.log('Banco conectado:', res.rows[0].now);
 });
 
-app.get('/', (req, res)=>{
-    res.json({api: 'taskflow', versão:'1.0', status:'online'});
+app.get('/', (req, res) => {
+    res.json({ api: 'taskflow', versão: '1.0', status: 'online' });
 });
 
 //----------------------------------------
@@ -77,7 +80,13 @@ app.use('/usuarios', usuariosRoutes);
 app.use('/projetos', autenticar, projetosRoutes);
 app.use('/prioridades', autenticar, prioridadesRoutes);
 
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi, {
+    customCssUrl: `${SWAGGER_CDN}/swagger-ui.css`,
+    customJs: [
+        `${SWAGGER_CDN}/swagger-ui-bundle.js`,
+        `${SWAGGER_CDN}/swagger-ui-standalone-preset.js`,
+    ],
+}));
 //----------------------------------------
 // Rota 404
 //----------------------------------------

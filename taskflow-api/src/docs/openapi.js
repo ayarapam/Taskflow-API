@@ -9,7 +9,7 @@ module.exports = {
         version: '1.0.0',
         description: 'API do TaskFlow - SENAI CTGAS-ER',
     },
-    servers: [{url: 'http://localhost:3000', description: 'Local'}], 
+    servers: [{url: '/', description: 'Este servidor'}], 
     security: [{ bearerAuth: [] }],
 
     paths: { ...tarefas.paths },

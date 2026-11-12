@@ -15,7 +15,7 @@ function validar(schema, origem) {
                 continue;
             }
 
-            //if (ausente) continue;
+            if (ausente) continue;
 
             if (regras.tipo === 'inteiro') {
                 const numero = typeof valor === "string" ? Number(valor) : valor;

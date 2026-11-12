@@ -21,7 +21,7 @@ function validar(schema, origem) {
                 const numero = typeof valor === "string" ? Number(valor) : valor;
 
                 if (!Number.isInteger(numero) || numero <= 0) {
-                    erros.push(`O campo '${campo}' deve ser um número inteiro`);
+                    erros.push(`O campo '${campo}' deve ser um número inteiro positivo`);
                 }
 
             } else if (regras.tipo && typeof valor !== regras.tipo) {

@@ -12,11 +12,14 @@ const incluir = {
 
 function formatarProjeto(projeto) {
     const { tarefas, usuarios, ...resto } = projeto;
+    
     return {
         ...resto,
         tarefa: tarefas?.texto,
         usuario: usuarios?.nome,
     };
+
+    
 };
 
 module.exports = {
@@ -59,15 +62,24 @@ module.exports = {
         //     [nome, descricao || null, usuario_id]
         // );
         // return result.rows[0];
-        const result = await prisma.projetos.create({
+        const projeto = await prisma.projetos.create({
             data: {
-                nome: nome,
+                nome,
                 descricao: descricao || null,
-                usuario_id: usuario_id
+                usuario_id
+            },
+            select: {
+                id: true,
+                nome: true,
+                descricao: true,
+                usuario_id: true,
+                criado_em: true,
+                ...incluir,
             }
         });
-        return result;
+        return formatarProjeto(projeto);
     },
+
     atualizar: async (id, dados) => {
         // const result = await pool.query(
         //     `UPDATE projetos SET
@@ -80,15 +92,23 @@ module.exports = {
         // );
         // return result.rows[0] || null;
         const projeto = await prisma.projetos.update({
-            where:{id:id},
+            where: { id: Number(id) },
             data: {
                 nome: dados.nome,
-                descricao: dados.descricao || null,
-                usuario_id: Number(dados.usuario_id),
+                descricao: dados.descricao ?? null,
+            },
+            select: {
+                id: true,
+                nome: true,
+                descricao: true,
+                usuario_id: true,
+                criado_em: true,
+                ...incluir,
             }
         });
         return formatarProjeto(projeto)
     },
+    
     remover: async (id) => {
         try {
             const projeto = await prisma.projetos.delete({

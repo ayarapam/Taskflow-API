@@ -12,7 +12,11 @@ const projetosController = {
     // rotas - get
     //----------------------------------------
     async listar(req, res) {
-        res.json(await projetoModel.listar());
+        const projetos = await projetoModel.listar();
+        res.json(projetos.map((projeto) => ({
+            ...projeto,
+            podeEditar: Number(projeto.usuario_id) === Number(req.usuario.id),
+        })));
     },
 
     //----------------------------------------
@@ -54,7 +58,7 @@ const projetosController = {
     const projeto = await projetoModel.adicionar(
         nome,
         descricao,
-        usuario_id
+        Number(req.usuario.id)
     );
 
     res.status(201).json(projeto);
@@ -64,11 +68,22 @@ const projetosController = {
     // rotas - put
     //----------------------------------------
     async atualizar(req, res) {
-        const atualizada = await projetoModel.atualizar(parseInt(req.params.id), req.body);
-        if (!atualizada) {
+        const id = parseInt(req.params.id, 10);
+        const projeto = await projetoModel.buscarPorId(id);
+
+        if (!projeto) {
             throw criarErro(404, 'Projeto não encontrado');
         }
-        res.json(atualizada);
+
+        if (Number(projeto.usuario_id) !== Number(req.usuario.id)) {
+            throw criarErro(
+                403,
+                `Este projeto foi criado por ${projeto.usuario || 'outro usuário'}. Apenas quem criou pode editá-lo.`
+            );
+        }
+
+        const atualizada = await projetoModel.atualizar(id, req.body);
+        res.json({ ...atualizada, podeEditar: true });
     },
 
     //----------------------------------------

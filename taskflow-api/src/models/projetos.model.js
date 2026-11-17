@@ -15,6 +15,7 @@ function formatarProjeto(projeto) {
     
     return {
         ...resto,
+        status: projeto.ativo === false ? 'concluido' : 'ativo',
         tarefa: tarefas?.texto,
         usuario: usuarios?.nome,
     };
@@ -30,6 +31,7 @@ module.exports = {
                 nome: true,
                 descricao: true,
                 usuario_id: true,
+                ativo: true,
                 criado_em: true,
                 ...incluir,
             },
@@ -81,27 +83,19 @@ module.exports = {
     },
 
     atualizar: async (id, dados) => {
-        // const result = await pool.query(
-        //     `UPDATE projetos SET
-        //      nome       = COALESCE($1, nome),
-        //      descricao  = COALESCE($2, descricao),
-        //      usuario_id = COALESCE($3, usuario_id)
-        //     WHERE id = $4
-        //  RETURNING *`,
-        //     [dados.nome, dados.descricao, dados.ativo, id]
-        // );
-        // return result.rows[0] || null;
         const projeto = await prisma.projetos.update({
             where: { id: Number(id) },
             data: {
                 nome: dados.nome,
                 descricao: dados.descricao ?? null,
+                ...(dados.status !== undefined ? { ativo: dados.status === 'ativo' } : {}),
             },
             select: {
                 id: true,
                 nome: true,
                 descricao: true,
                 usuario_id: true,
+                ativo: true,
                 criado_em: true,
                 ...incluir,
             }

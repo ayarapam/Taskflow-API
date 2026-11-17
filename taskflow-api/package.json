@@ -3,11 +3,17 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --runInBand",
+    "testv": "jest --runInBand --verbose",
     "dev": "nodemon server.js",
     "start": "node server.js",
     "postinstall": "prisma generate"
   },
+
+  "jest": {
+  "setupFiles": ["<rootDir>/tests/setup-env.js"]
+},
+
   "keywords": [],
   "author": "",
   "license": "ISC",

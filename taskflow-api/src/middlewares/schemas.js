@@ -17,6 +17,7 @@ const schemas = {
     projeto: {
         nome: { obrigatorio: true, tipo: "string" },
         descricao: { obrigatorio: false, tipo: "string", maxLength: 200 },
+        status: { obrigatorio: false, tipo: "string", enum: ["ativo", "concluido"] },
     },
     descricao: {
             obrigatorio: false, 

@@ -6,17 +6,17 @@ const express = require('express');
 //----------------------------------------
 // rotas - controllers
 //----------------------------------------
-const tarefasRoutes = require('./src/routes/tarefas.routes');
-const usuariosRoutes = require('./src/routes/usuarios.routes');
-const projetosRoutes = require('./src/routes/projetos.routes');
-const prioridadesRoutes = require('./src/routes/prioridades.routes');
+const tarefasRoutes = require('./src/routes/tarefas.routes.js');
+const usuariosRoutes = require('./src/routes/usuarios.routes.js');
+const projetosRoutes = require('./src/routes/projetos.routes.js');
+const prioridadesRoutes = require('./src/routes/prioridades.routes.js');
 const authRoutes = require('./src/routes/auth.routes.js')
-const tratarErros = require('./src/middlewares/erro.middleware');
-const autenticar = require('./src/middlewares/autenticar');
-const logger = require('./src/middlewares/logger');
-const validarContentType = require('./src/middlewares/validarContentType');
-const temporizador = require('./src/middlewares/temporizador');
-const criarErro = require("./src/utils/criarErro");
+const tratarErros = require('./src/middlewares/erro.middleware.js');
+const autenticar = require('./src/middlewares/autenticar.js');
+const logger = require('./src/middlewares/logger.js');
+const validarContentType = require('./src/middlewares/validarContentType.js');
+const temporizador = require('./src/middlewares/temporizador.js');
+const criarErro = require("./src/utils/criarErro.js");
 const cors = require('cors');
 
 
@@ -24,7 +24,7 @@ const swaggerUi = require('swagger-ui-express');
 const SWAGGER_CDN =
     'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14';
 
-const openapi = require('./src/docs/openapi');
+const openapi = require('./src/docs/openapi.js');
 
 //----------------------------------------
 // Configuração do Express

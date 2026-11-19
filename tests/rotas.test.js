@@ -1,6 +1,6 @@
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
-const app = require('../taskflow-api/app');
+const app = require('../app');
 const prisma = require('../src/database/prisma');
 const pool = require('../src/database/db');
 

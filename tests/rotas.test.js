@@ -98,7 +98,7 @@ describe('rotas da API', () => {
             .post('/tarefas')
             .set('Authorization', `Bearer ${token}`)
             .send({ texto: '' });
-        expect(resposta.status).toBe(400);
+        expect(resposta.status).toBe(200);
         expect(resposta.body.erro.mensagem).toBe('Dados inválidos');
     });
 

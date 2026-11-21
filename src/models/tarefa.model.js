@@ -28,6 +28,7 @@ const tarefaModel = {
             select: {
                 id: true,
                 texto: true,
+                descricao: true,
                 coluna: true,
                 usuario_id: true,
                 projeto_id: true,
@@ -76,6 +77,7 @@ const tarefaModel = {
 
     adicionar: async ({
         texto,
+        descricao,
         idprioridade,
         coluna,
         usuario_id,
@@ -85,6 +87,7 @@ const tarefaModel = {
         const result = await prisma.tarefas.create({
             data: {
                 texto: texto,
+                descricao: descricao,
                 idprioridade: idprioridade || 2,
                 coluna: coluna || "afazer",
                 usuario_id: usuario_id,
@@ -166,6 +169,7 @@ const tarefaModel = {
             where: { id },
             data: {
                 texto: dados.texto,
+                descricao: dados.descricao,
                 coluna: dados.coluna,
                 idprioridade: dados.idprioridade,
                 usuario_id: dados.usuario_id,

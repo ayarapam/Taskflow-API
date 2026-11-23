@@ -60,12 +60,21 @@ model tarefas {
 }
 
 model usuarios {
-  id          Int           @id @default(autoincrement())
-  nome        String        @db.VarChar(100)
-  senha_hash  String        @db.VarChar(255)
-  criado_em   DateTime?     @default(now()) @db.Timestamp(6)
-  email       String        @unique @db.VarChar(150)
-  comentarios comentarios[]
-  projetos    projetos[]
-  tarefas     tarefas[]
+  id             Int             @id @default(autoincrement())
+  nome           String          @db.VarChar(100)
+  senha_hash     String          @db.VarChar(255)
+  criado_em      DateTime?       @default(now()) @db.Timestamp(6)
+  email          String          @unique @db.VarChar(150)
+  comentarios    comentarios[]
+  fundos_usuario fundos_usuario?
+  projetos       projetos[]
+  tarefas        tarefas[]
+}
+
+model fundos_usuario {
+  id         Int      @id @default(autoincrement())
+  usuario_id Int      @unique
+  imagem     Bytes
+  tipo_mime  String   @db.VarChar(100)
+  usuarios   usuarios @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_fundo_usuario")
 }

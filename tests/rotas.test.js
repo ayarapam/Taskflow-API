@@ -92,14 +92,4 @@ describe('rotas da API', () => {
         expect(resposta.status).toBe(400);
         expect(resposta.body.erro.mensagem).toBe('Dados inválidos');
     });
-
-    // test('POST /tarefas inválido responde 400', async () => {
-    //     const resposta = await request(app)
-    //         .post('/tarefas')
-    //         .set('Authorization', `Bearer ${token}`)
-    //         .send({ texto: '' });
-    //     expect(resposta.status).toBe(400);
-    //     expect(resposta.body.erro.mensagem).toBe('Dados inválidos');
-    // });
-
 });

@@ -4,7 +4,7 @@ const schemas = {
     },
     tarefa: {
         texto: { obrigatorio: true, tipo: "string", minLength: 3 , maxLength: 30 },
-        texto: { obrigatorio: false, tipo: "string" , maxLength: 200 },
+        descricao: { obrigatorio: false, tipo: "string" , maxLength: 200 },
         coluna: { obrigatorio: true, tipo: "string", enum: ["afazer", "andamento", "concluido"] },
         usuario_id: { obrigatorio: true, tipo: "inteiro" },
         projeto_id: { obrigatorio: true, tipo: "inteiro" },
